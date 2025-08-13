@@ -37,8 +37,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const mainItems = [
   { title: "Início", url: "/", icon: Home },
   { title: "Fluxo de Caixa", url: "/fluxo-caixa", icon: TrendingUp },
-  { title: "Contas a Pagar", url: "/contas-pagar", icon: CreditCard },
-  { title: "Contas a Receber", url: "/contas-receber", icon: Receipt },
+  { title: "Contas", url: "/contas", icon: CreditCard },
   { title: "Clientes", url: "/clientes", icon: Users },
   { title: "Fornecedores", url: "/fornecedores", icon: Building2 },
   { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
