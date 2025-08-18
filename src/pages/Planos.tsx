@@ -13,22 +13,22 @@ import { Link } from "react-router-dom";
 const Planos = () => {
   const plans = [
     {
-      name: "Gratuito",
+      name: "Trial Gratuito",
       price: "R$ 0",
-      period: "/para sempre",
-      description: "Para começar a testar",
+      period: "/7 dias",
+      description: "Teste todas as funcionalidades",
       popular: false,
       features: [
-        { name: "Até 50 transações/mês", included: true },
-        { name: "1 integração de marketplace", included: true },
-        { name: "Relatórios básicos", included: true },
-        { name: "Suporte por email", included: true },
-        { name: "Múltiplas integrações", included: false },
-        { name: "Relatórios avançados", included: false },
-        { name: "Suporte prioritário", included: false },
-        { name: "Backup automático", included: false }
+        { name: "Acesso completo por 7 dias", included: true },
+        { name: "Todas as integrações", included: true },
+        { name: "Relatórios avançados", included: true },
+        { name: "Suporte prioritário", included: true },
+        { name: "Todas as funcionalidades", included: true },
+        { name: "Sem limitações", included: true },
+        { name: "Após 7 dias, assinatura necessária", included: false },
+        { name: "Backup automático", included: true }
       ],
-      buttonText: "Comece grátis",
+      buttonText: "Iniciar trial",
       buttonVariant: "outline" as const
     },
     {
