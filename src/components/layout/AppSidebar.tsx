@@ -10,7 +10,9 @@ import {
   Calendar,
   Settings,
   LogOut,
-  User
+  User,
+  Menu,
+  CreditCard as CardIcon
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -33,6 +35,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SettingsDialog } from "@/components/settings/SettingsDialog";
+import { SubscriptionDialog } from "@/components/settings/SubscriptionDialog";
 
 const mainItems = [
   { title: "Início", url: "/", icon: Home },
@@ -49,10 +53,12 @@ export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
+  const [showSettings, setShowSettings] = useState(false);
+  const [showSubscription, setShowSubscription] = useState(false);
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "hover:bg-sidebar-accent/50";
+    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground transition-colors duration-200";
 
   return (
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
@@ -92,36 +98,46 @@ export function AppSidebar() {
 
       <SidebarFooter>
         <div className="p-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent cursor-pointer">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src="/placeholder-user.jpg" />
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    <User className="w-4 h-4" />
-                  </AvatarFallback>
-                </Avatar>
-                {!collapsed && (
-                  <div className="flex-1 text-left">
-                    <p className="text-sm font-medium text-sidebar-foreground">João Silva</p>
-                    <p className="text-xs text-sidebar-foreground/60">joao@exemplo.com</p>
-                  </div>
-                )}
+          <div className="flex items-center gap-2 p-2">
+            <Avatar className="w-8 h-8">
+              <AvatarImage src="/placeholder-user.jpg" />
+              <AvatarFallback className="bg-primary text-primary-foreground">
+                <User className="w-4 h-4" />
+              </AvatarFallback>
+            </Avatar>
+            {!collapsed && (
+              <div className="flex-1 text-left">
+                <p className="text-sm font-medium text-sidebar-foreground">João Silva</p>
+                <p className="text-xs text-sidebar-foreground/60">joao@exemplo.com</p>
               </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Configurações</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-1 rounded hover:bg-sidebar-accent transition-colors duration-200">
+                  <Menu className="h-4 w-4 text-sidebar-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={() => setShowSettings(true)}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Configurações</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowSubscription(true)}>
+                  <CardIcon className="mr-2 h-4 w-4" />
+                  <span>Gerenciar assinatura</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </SidebarFooter>
+
+      <SettingsDialog open={showSettings} onOpenChange={setShowSettings} />
+      <SubscriptionDialog open={showSubscription} onOpenChange={setShowSubscription} />
     </Sidebar>
   );
 }
