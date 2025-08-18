@@ -132,41 +132,32 @@ const Homepage = () => {
           </div>
           
           <div className="relative">
-            <div className="bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl p-8 relative overflow-hidden">
-              <div className="aspect-video bg-background rounded-lg shadow-lg flex items-center justify-center relative">
-                <div className="text-center space-y-4">
-                  <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                    <Users className="w-12 h-12 text-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-center gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-success rounded-full"></div>
-                        <span>Vendas: +32%</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-primary rounded-full"></div>
-                        <span>Lucro: +28%</span>
-                      </div>
-                    </div>
-                    <p className="text-2xl font-bold text-primary">R$ 47.832,00</p>
-                    <p className="text-sm text-muted-foreground">Faturamento do mês</p>
-                  </div>
-                </div>
-              </div>
+            <div className="relative rounded-2xl overflow-hidden">
+              <img 
+                src="/src/assets/hero-woman-laptop.jpg" 
+                alt="Mulher de óculos trabalhando em laptop com dashboards financeiros" 
+                className="w-full h-auto"
+              />
               
-              {/* Floating metrics */}
-              <div className="absolute top-4 right-4 bg-background rounded-lg shadow-md p-3 animate-pulse">
+              {/* Floating metrics overlay */}
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur rounded-lg shadow-md p-3 animate-pulse">
                 <div className="flex items-center gap-2 text-sm">
                   <TrendingUp className="w-4 h-4 text-success" />
-                  <span className="font-medium">+15% este mês</span>
+                  <span className="font-medium text-foreground">+15% este mês</span>
                 </div>
               </div>
               
-              <div className="absolute bottom-4 left-4 bg-background rounded-lg shadow-md p-3 animate-pulse">
+              <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-lg shadow-md p-3 animate-pulse">
                 <div className="flex items-center gap-2 text-sm">
                   <BarChart3 className="w-4 h-4 text-primary" />
-                  <span className="font-medium">127 vendas hoje</span>
+                  <span className="font-medium text-foreground">127 vendas hoje</span>
+                </div>
+              </div>
+              
+              <div className="absolute top-1/2 left-4 bg-white/90 backdrop-blur rounded-lg shadow-md p-3">
+                <div className="text-center space-y-1">
+                  <p className="text-lg font-bold text-primary">R$ 47.832</p>
+                  <p className="text-xs text-muted-foreground">Faturamento</p>
                 </div>
               </div>
             </div>

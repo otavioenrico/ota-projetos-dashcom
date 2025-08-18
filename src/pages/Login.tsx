@@ -78,44 +78,45 @@ const Login = () => {
       <div className="container mx-auto px-4 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           {/* Left side - Image/Illustration */}
-          <div className="hidden lg:block">
-            <div className="bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl p-12 relative overflow-hidden">
-              <div className="space-y-6">
+          <div className="hidden lg:block relative">
+            <img 
+              src="/src/assets/login-office.jpg" 
+              alt="Ambiente profissional de escritório" 
+              className="w-full h-full object-cover rounded-2xl"
+            />
+            <div className="absolute inset-0 bg-primary/20 rounded-2xl flex items-center justify-center p-12">
+              <div className="text-white text-center space-y-6">
                 <div className="space-y-2">
                   <h2 className="text-3xl font-bold">
                     Bem-vindo de volta!
                   </h2>
-                  <p className="text-muted-foreground text-lg">
+                  <p className="text-lg opacity-90">
                     Acesse seu painel e continue gerenciando seu e-commerce com inteligência.
                   </p>
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-4 bg-background rounded-lg shadow-sm">
-                    <div className="w-10 h-10 bg-success/10 rounded-full flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-success" />
+                  <div className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur rounded-lg">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-white" />
                     </div>
                     <div>
                       <p className="font-medium">Vendas em alta</p>
-                      <p className="text-sm text-muted-foreground">+25% este mês</p>
+                      <p className="text-sm opacity-80">+25% este mês</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3 p-4 bg-background rounded-lg shadow-sm">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                      <span className="text-primary font-bold">R$</span>
+                  <div className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur rounded-lg">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold">R$</span>
                     </div>
                     <div>
                       <p className="font-medium">Faturamento</p>
-                      <p className="text-sm text-muted-foreground">R$ 47.832 este mês</p>
+                      <p className="text-sm opacity-80">R$ 47.832 este mês</p>
                     </div>
                   </div>
                 </div>
               </div>
-              
-              {/* Decorative elements */}
-              <div className="absolute top-4 right-4 w-20 h-20 bg-primary/10 rounded-full"></div>
-              <div className="absolute bottom-4 left-4 w-16 h-16 bg-success/10 rounded-full"></div>
             </div>
           </div>
 
@@ -154,11 +155,11 @@ const Login = () => {
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Usuário ou Email</Label>
                     <Input
                       id="email"
-                      type="email"
-                      placeholder="seu@email.com"
+                      type="text"
+                      placeholder="Digite seu usuário ou email"
                       value={formData.email}
                       onChange={(e) => setFormData(prev => ({...prev, email: e.target.value}))}
                       required

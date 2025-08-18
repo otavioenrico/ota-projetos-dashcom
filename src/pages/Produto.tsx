@@ -125,18 +125,30 @@ const Produto = () => {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
-        <div className="text-center max-w-4xl mx-auto space-y-6">
-          <Badge variant="secondary" className="text-sm">
-            💡 Solução completa para e-commerce
-          </Badge>
-          <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-            O que é o DashComm?
-          </h1>
-          <p className="text-xl text-muted-foreground leading-relaxed">
-            Uma plataforma completa de gestão financeira e operacional para e-commerce. 
-            Integre todas suas vendas, controle seu fluxo de caixa e tome decisões 
-            inteligentes baseadas em dados reais.
-          </p>
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <Badge variant="secondary" className="text-sm">
+              💡 Solução completa para e-commerce
+            </Badge>
+            <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
+              O que é o DashComm?
+            </h1>
+            <p className="text-xl text-muted-foreground leading-relaxed">
+              Uma plataforma completa de gestão financeira e operacional para e-commerce. 
+              Integre todas suas vendas, controle seu fluxo de caixa e tome decisões 
+              inteligentes baseadas em dados reais.
+            </p>
+          </div>
+          
+          <div className="relative">
+            <div className="relative rounded-2xl overflow-hidden">
+              <img 
+                src="/src/assets/product-dashboard.jpg" 
+                alt="Dashboard moderno com analytics e métricas de e-commerce" 
+                className="w-full h-auto"
+              />
+            </div>
+          </div>
         </div>
       </section>
 

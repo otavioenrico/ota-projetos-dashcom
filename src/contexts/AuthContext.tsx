@@ -3,11 +3,12 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 interface User {
   email: string;
   name: string;
+  username: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (usernameOrEmail: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -27,14 +28,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (usernameOrEmail: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
     // Simulação de autenticação - credenciais fixas para teste
-    if (email === 'admin' && password === '12345') {
+    if ((usernameOrEmail === 'admin' || usernameOrEmail === 'admin@dashcomm.com') && password === '12345') {
       const userData = {
         email: 'admin@dashcomm.com',
-        name: 'Administrador'
+        name: 'Administrador',
+        username: 'admin'
       };
       
       setUser(userData);
