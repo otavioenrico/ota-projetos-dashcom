@@ -5,29 +5,46 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   TrendingUp, 
   Eye,
   EyeOff,
-  ArrowLeft
+  ArrowLeft,
+  AlertCircle,
+  Loader2
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const from = location.state?.from?.pathname || "/dashboard";
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aqui seria implementada a lógica de autenticação
-    console.log("Login:", formData);
-    // Simulando login bem-sucedido
-    navigate("/dashboard");
+    setError("");
+    
+    try {
+      const success = await login(formData.email, formData.password);
+      if (success) {
+        navigate(from, { replace: true });
+      } else {
+        setError("Credenciais inválidas. Use: admin / 12345");
+      }
+    } catch (err) {
+      setError("Erro ao fazer login. Tente novamente.");
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -119,6 +136,22 @@ const Login = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Credenciais de teste:</strong><br />
+                    Login: admin<br />
+                    Senha: 12345
+                  </AlertDescription>
+                </Alert>
+
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
@@ -180,8 +213,15 @@ const Login = () => {
                     </a>
                   </div>
 
-                  <Button type="submit" className="w-full">
-                    Entrar
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Entrando...
+                      </>
+                    ) : (
+                      "Entrar"
+                    )}
                   </Button>
                 </form>
 

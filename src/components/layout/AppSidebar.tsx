@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   Home, 
   TrendingUp, 
@@ -39,22 +40,28 @@ import { SettingsDialog } from "@/components/settings/SettingsDialog";
 import { SubscriptionDialog } from "@/components/settings/SubscriptionDialog";
 
 const mainItems = [
-  { title: "Início", url: "/", icon: Home },
-  { title: "Fluxo de Caixa", url: "/fluxo-caixa", icon: TrendingUp },
-  { title: "Contas", url: "/contas", icon: CreditCard },
-  { title: "Clientes", url: "/clientes", icon: Users },
-  { title: "Fornecedores", url: "/fornecedores", icon: Building2 },
-  { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
-  { title: "Agenda", url: "/agenda", icon: Calendar },
+  { title: "Início", url: "/dashboard", icon: Home },
+  { title: "Fluxo de Caixa", url: "/dashboard/fluxo-caixa", icon: TrendingUp },
+  { title: "Contas", url: "/dashboard/contas", icon: CreditCard },
+  { title: "Clientes", url: "/dashboard/clientes", icon: Users },
+  { title: "Fornecedores", url: "/dashboard/fornecedores", icon: Building2 },
+  { title: "Relatórios", url: "/dashboard/relatorios", icon: BarChart3 },
+  { title: "Agenda", url: "/dashboard/agenda", icon: Calendar },
 ];
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
+  const { user, logout } = useAuth();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
   const [showSettings, setShowSettings] = useState(false);
   const [showSubscription, setShowSubscription] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = "/";
+  };
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
@@ -107,8 +114,8 @@ export function AppSidebar() {
             </Avatar>
             {!collapsed && (
               <div className="flex-1 text-left">
-                <p className="text-sm font-medium text-sidebar-foreground">João Silva</p>
-                <p className="text-xs text-sidebar-foreground/60">joao@exemplo.com</p>
+                <p className="text-sm font-medium text-sidebar-foreground">{user?.name || "Usuário"}</p>
+                <p className="text-xs text-sidebar-foreground/60">{user?.email || "usuario@exemplo.com"}</p>
               </div>
             )}
             <DropdownMenu>
@@ -126,7 +133,7 @@ export function AppSidebar() {
                   <CardIcon className="mr-2 h-4 w-4" />
                   <span>Gerenciar assinatura</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive">
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sair</span>
                 </DropdownMenuItem>
