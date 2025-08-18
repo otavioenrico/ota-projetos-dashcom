@@ -4,6 +4,15 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
+
+// Public pages
+import Homepage from "./pages/Homepage";
+import Produto from "./pages/Produto";
+import Planos from "./pages/Planos";
+import Registrar from "./pages/Registrar";
+import Login from "./pages/Login";
+
+// Dashboard pages
 import Dashboard from "./pages/Dashboard";
 import FluxoCaixa from "./pages/FluxoCaixa";
 import Contas from "./pages/Contas";
