@@ -1,64 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* DashComm Design System - 60% Branco, 30% Preto, 10% Azul #2F60DD
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 248 250 252;
-    --foreground: 222.2 84% 4.9%;
+    /* DashComm Brand Colors */
+    --background: 0 0% 100%; /* #FFFFFF - 60% usage */
+    --foreground: 0 0% 0%; /* #000000 - 30% usage */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 0%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 0%;
 
-    --primary: 214 84% 56%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary Brand Color - Azul #2F60DD (10% usage) */
+    --primary: 222 77% 53%; /* #2F60DD */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 222 77% 53%;
+    --primary-active: 222 77% 53%;
 
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 0%;
 
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
     --success: 142 71% 45%;
-    --success-foreground: 210 40% 98%;
+    --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
-    --warning-foreground: 222.2 47.4% 11.2%;
+    --warning-foreground: 0 0% 0%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 214 84% 56%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 222 77% 53%;
 
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 0%;
+    --sidebar-primary: 0 0% 0%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    
+    /* Sidebar accent uses brand blue with hover states */
+    --sidebar-accent: 222 77% 53%; /* Brand blue for active state */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-accent-hover: 222 77% 53% / 0.05; /* 5% opacity for hover */
+    --sidebar-accent-active: 222 77% 53% / 0.1; /* 10% opacity for active */
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 214 90% 88%;
-
-    --sidebar-accent-foreground: 214 84% 20%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 222 77% 53%;
   }
 
   .dark {
@@ -106,6 +110,26 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+}
+
+/* DashComm Button States */
+@layer components {
+  .btn-hover {
+    @apply hover:bg-primary/5 transition-colors duration-200;
+  }
+  
+  .btn-active {
+    @apply active:bg-primary/10 transition-colors duration-100;
+  }
+  
+  .sidebar-nav-hover {
+    @apply hover:bg-primary/5 transition-colors duration-200;
+  }
+  
+  .sidebar-nav-active {
+    @apply bg-primary text-primary-foreground font-medium;
   }
 }

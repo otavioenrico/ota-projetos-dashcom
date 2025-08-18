@@ -42,7 +42,7 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
       price: "R$ 59",
       period: "/mês",
       description: "Ideal para começar",
-      features: ["Acesso completo", "Suporte por email", "Relatórios básicos"]
+      features: ["Acesso completo ao DashComm", "Suporte por email", "Relatórios básicos", "Até 1.000 transações/mês"]
     },
     {
       id: "annual",
@@ -51,7 +51,7 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
       period: "/ano",
       description: "Economize 20%",
       originalPrice: "R$ 708",
-      features: ["Acesso completo", "Suporte prioritário", "Relatórios avançados", "Integrações ilimitadas"]
+      features: ["Acesso completo ao DashComm", "Suporte prioritário", "Relatórios avançados", "Integrações ilimitadas", "Transações ilimitadas", "Backup automático"]
     }
   ];
 
@@ -83,7 +83,7 @@ export function SubscriptionDialog({ open, onOpenChange }: SubscriptionDialogPro
             <div className="text-center mb-6">
               <h3 className="text-lg font-semibold mb-2">Escolha seu plano</h3>
               <p className="text-muted-foreground">
-                Desbloqueie todo o potencial do FlowFront
+                Desbloqueie todo o potencial do DashComm
               </p>
             </div>
 

@@ -58,7 +58,7 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground transition-colors duration-200";
+    isActive ? "sidebar-nav-active" : "sidebar-nav-hover";
 
   return (
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
@@ -70,8 +70,8 @@ export function AppSidebar() {
             </div>
             {!collapsed && (
               <div>
-                <h1 className="font-bold text-lg text-sidebar-foreground">FlowFront</h1>
-                <p className="text-xs text-sidebar-foreground/60">Dashboard E-commerce</p>
+                <h1 className="font-bold text-lg text-sidebar-foreground">DashComm</h1>
+                <p className="text-xs text-sidebar-foreground/60">Gestão de E-commerce</p>
               </div>
             )}
           </div>
