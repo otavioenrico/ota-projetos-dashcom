@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, isLoading } = useAuth();
+  const { user, orgId, isLoading } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -21,6 +21,11 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (!user) {
     // Redireciona para login mas salva a localização atual
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (!orgId) {
+    // User exists but no org yet, redirect to auth complete for setup
+    return <Navigate to="/auth/complete" replace />;
   }
 
   return <>{children}</>;

@@ -13,6 +13,7 @@ import Produto from "./pages/Produto";
 import Planos from "./pages/Planos";
 import Registrar from "./pages/Registrar";
 import Login from "./pages/Login";
+import AuthComplete from "./pages/AuthComplete";
 import CentralAjuda from "./pages/CentralAjuda";
 import SobreNos from "./pages/SobreNos";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/planos" element={<Planos />} />
           <Route path="/registrar" element={<Registrar />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/auth/complete" element={<AuthComplete />} />
           <Route path="/central-ajuda" element={<CentralAjuda />} />
           <Route path="/sobre-nos" element={<SobreNos />} />
           <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
