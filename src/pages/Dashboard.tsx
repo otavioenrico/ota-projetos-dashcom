@@ -116,28 +116,57 @@ export default function Dashboard() {
 
       {/* Métricas principais */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          title="Faturamento do Mês"
-          value={`R$ ${kpis.monthlyRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-          change={{ value: `${Math.abs(kpis.revenueDelta).toFixed(1)}%`, trend: kpis.revenueDelta >= 0 ? "up" : "down" }}
-          icon={DollarSign}
-        />
-        <MetricCard
-          title="Contas a Receber"
-          value={`R$ ${kpis.accountsReceivable.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-          icon={CreditCard}
-        />
-        <MetricCard
-          title="Contas a Pagar"
-          value={`R$ ${kpis.accountsPayable.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-          change={{ value: `${Math.abs(kpis.expensesDelta).toFixed(1)}%`, trend: kpis.expensesDelta >= 0 ? "up" : "down" }}
-          icon={CreditCard}
-        />
-        <MetricCard
-          title="Novos Clientes"
-          value={kpis.newCustomers.toString()}
-          icon={Users}
-        />
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Faturamento do Mês</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">R$ 0,00</div>
+            <p className="text-xs text-muted-foreground">
+              0,00% em relação ao mês anterior
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Contas a Receber</CardTitle>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">R$ 0,00</div>
+            <p className="text-xs text-muted-foreground">
+              0,00% em relação ao mês anterior
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Contas a Pagar</CardTitle>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">R$ 0,00</div>
+            <p className="text-xs text-muted-foreground">
+              0,00% em relação ao mês anterior
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Novos Clientes</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-muted-foreground">
+              0,00% em relação ao mês anterior
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Section */}
@@ -151,7 +180,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="h-[200px] flex items-center justify-center text-muted-foreground">
-              {isLoading ? "Carregando gráfico..." : "Gráfico do fluxo de caixa será implementado aqui"}
+              Gráfico do fluxo de caixa será implementado aqui
             </div>
           </CardContent>
         </Card>
@@ -164,28 +193,8 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {isLoading ? (
-                <div className="text-muted-foreground">Carregando...</div>
-              ) : upcomingBills.length > 0 ? (
-                upcomingBills.map((bill: any) => (
-                  <div key={bill.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div>
-                      <p className="font-medium">{bill.description}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Vence em {format(new Date(bill.due_date), 'dd/MM/yyyy', { locale: ptBR })}
-                      </p>
-                    </div>
-                    <Badge variant={bill.board === 'receivables' ? 'default' : 'secondary'}>
-                      R$ {Number(bill.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </Badge>
-                  </div>
-                ))
-              ) : (
-                <div className="text-muted-foreground text-center py-4">
-                  Nenhum vencimento nos próximos 7 dias
-                </div>
-              )}
+            <div className="text-center py-8 text-muted-foreground">
+              Nenhum vencimento nos próximos 7 dias
             </div>
           </CardContent>
         </Card>
@@ -200,41 +209,8 @@ export default function Dashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {isLoading ? (
-              <div className="text-muted-foreground">Carregando atividades...</div>
-            ) : recentActivities.length > 0 ? (
-              recentActivities.map((activity: any) => (
-                <div key={activity.id} className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg">
-                  <div className={`p-2 rounded-full ${
-                    activity.kind === 'in' ? 'bg-green-100 text-green-600' :
-                    activity.kind === 'out' ? 'bg-red-100 text-red-600' :
-                    'bg-blue-100 text-blue-600'
-                  }`}>
-                    {activity.kind === 'in' ? <TrendingUp className="w-4 h-4" /> :
-                     activity.kind === 'out' ? <TrendingDown className="w-4 h-4" /> :
-                     <Users className="w-4 h-4" />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{activity.message}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {format(new Date(activity.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
-                    </p>
-                  </div>
-                  {activity.amount && (
-                    <div className={`text-sm font-medium ${
-                      activity.kind === 'in' ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {activity.kind === 'in' ? '+' : '-'}R$ {Number(activity.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="text-muted-foreground text-center py-4">
-                Nenhuma atividade recente
-              </div>
-            )}
+          <div className="text-center py-8 text-muted-foreground">
+            Nenhuma atividade recente
           </div>
         </CardContent>
       </Card>
