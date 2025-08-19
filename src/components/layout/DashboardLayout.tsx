@@ -9,7 +9,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex w-full" style={{ backgroundColor: '#f6f6fa' }}>
         <AppSidebar />
         <SidebarInset>
           <header className="h-14 border-b bg-card flex items-center px-4">

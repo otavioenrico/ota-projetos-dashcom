@@ -137,7 +137,7 @@ const FluxoCaixa = () => {
         </div>
         <Button onClick={() => setShowTransactionModal(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Nova Transação
+          Cadastrar Transação
         </Button>
       </div>
 

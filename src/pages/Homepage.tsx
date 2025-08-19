@@ -128,9 +128,14 @@ const Homepage = () => {
             <p className="text-xl text-muted-foreground leading-relaxed">
               Destrave a operação do seu e-commerce e dedique seu tempo com o que realmente importa.
             </p>
-            <Button size="lg" className="text-lg px-8 py-6" asChild>
-              <Link to="/registrar">Crie sua conta gratuita agora</Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button size="lg" className="text-lg px-8 py-6" asChild>
+                <Link to="/registrar">Crie sua conta</Link>
+              </Button>
+              <Button size="lg" variant="outline" className="text-lg px-8 py-6" asChild>
+                <Link to="/produto">Saiba Mais</Link>
+              </Button>
+            </div>
           </div>
           
           <div className="relative">
@@ -141,34 +146,13 @@ const Homepage = () => {
                 className="w-full h-auto"
               />
               
-              {/* Floating metrics overlay */}
-              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur rounded-lg shadow-md p-3 animate-pulse">
-                <div className="flex items-center gap-2 text-sm">
-                  <TrendingUp className="w-4 h-4 text-success" />
-                  <span className="font-medium text-foreground">+15% este mês</span>
-                </div>
-              </div>
-              
-              <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-lg shadow-md p-3 animate-pulse">
-                <div className="flex items-center gap-2 text-sm">
-                  <BarChart3 className="w-4 h-4 text-primary" />
-                  <span className="font-medium text-foreground">127 vendas hoje</span>
-                </div>
-              </div>
-              
-              <div className="absolute top-1/2 left-4 bg-white/90 backdrop-blur rounded-lg shadow-md p-3">
-                <div className="text-center space-y-1">
-                  <p className="text-lg font-bold text-primary">R$ 47.832</p>
-                  <p className="text-xs text-muted-foreground">Faturamento</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Integrations Section */}
-      <section className="bg-muted/50 py-16">
+      <section style={{ backgroundColor: '#f6f6fa' }} className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold mb-4">
@@ -209,7 +193,7 @@ const Homepage = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="bg-muted/50 py-20">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
@@ -276,7 +260,7 @@ const Homepage = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="bg-muted/50 py-20">
+      <section style={{ backgroundColor: '#f6f6fa' }} className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">

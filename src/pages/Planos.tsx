@@ -30,9 +30,6 @@ const Planos = () => {
       { name: "Fluxo de caixa completo", included: true },
       { name: "Agenda financeira", included: true },
       { name: "Backup automático", included: true },
-      { name: "API para integrações customizadas", included: isAnnual },
-      { name: "Consultoria mensal gratuita", included: isAnnual },
-      { name: "Relatórios personalizados", included: isAnnual },
       { name: "Prioridade em novos recursos", included: isAnnual }
     ]
   };
@@ -200,14 +197,14 @@ const Planos = () => {
 
       {/* Free Trial Card */}
       <section className="container mx-auto px-4 pb-20">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-4xl mx-auto">
           <Card className="text-center">
-            <CardContent className="p-6">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8 text-primary" />
+            <CardContent className="p-4">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Zap className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Teste grátis por 7 dias</h3>
-              <p className="text-muted-foreground mb-4">
+              <h3 className="text-lg font-bold mb-2">Teste grátis por 7 dias</h3>
+              <p className="text-sm text-muted-foreground mb-3">
                 Experimente todas as funcionalidades sem compromisso
               </p>
               <Button variant="outline" className="w-full" asChild>

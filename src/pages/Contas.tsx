@@ -41,6 +41,7 @@ const Contas = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [historicoAberto, setHistoricoAberto] = useState(false);
   const [contas, setContas] = useState<Conta[]>([
     {
       id: 1,
@@ -160,7 +161,19 @@ const Contas = () => {
     ));
     toast({
       title: "Conta concluída!",
-      description: "A conta foi movida para a lista de concluídos.",
+      description: "A conta foi movida para o histórico.",
+    });
+  };
+
+  const handleVoltarConta = (id: number) => {
+    setContas(contas.map(conta => 
+      conta.id === id 
+        ? { ...conta, status: "pendente" as const }
+        : conta
+    ));
+    toast({
+      title: "Conta restaurada!",
+      description: "A conta foi movida de volta para a lista ativa.",
     });
   };
 
@@ -563,13 +576,12 @@ const Contas = () => {
       </Card>
 
       {/* Tabelas */}
-      <Tabs defaultValue="todas" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="todas">Todas as Contas</TabsTrigger>
-          <TabsTrigger value="pagar">Contas a Pagar</TabsTrigger>
-          <TabsTrigger value="receber">Contas a Receber</TabsTrigger>
-          <TabsTrigger value="concluidas">Concluídas</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="todas" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="todas">Todas as Contas</TabsTrigger>
+            <TabsTrigger value="pagar">Contas a Pagar</TabsTrigger>
+            <TabsTrigger value="receber">Contas a Receber</TabsTrigger>
+          </TabsList>
         
         <TabsContent value="todas" className="mt-6">
           <Card>
@@ -604,17 +616,97 @@ const Contas = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="concluidas" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Contas Concluídas</CardTitle>
-            </CardHeader>
+        </Tabs>
+
+        {/* Seção de Histórico */}
+        <Card>
+          <CardHeader 
+            className="cursor-pointer" 
+            onClick={() => setHistoricoAberto(!historicoAberto)}
+          >
+            <div className="flex items-center justify-between">
+              <CardTitle>Histórico</CardTitle>
+              <Button variant="ghost" size="sm">
+                <svg 
+                  className={`h-4 w-4 transition-transform ${historicoAberto ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </Button>
+            </div>
+          </CardHeader>
+          {historicoAberto && (
             <CardContent>
-              {renderContasTable(contasConcluidas, "concluidas")}
+              {contasConcluidas.length > 0 ? (
+                <div className="space-y-4">
+                  {contasConcluidas.map((conta) => (
+                    <div key={conta.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
+                      <div className="flex items-center gap-4">
+                        <div>
+                          <p className="font-medium">{conta.descricao}</p>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span>{conta.fornecedor}</span>
+                            <span>•</span>
+                            <span>{new Date(conta.dataVencimento).toLocaleDateString("pt-BR")}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right flex items-center gap-3">
+                        <Badge className="bg-success/10 text-success border-success/20">
+                          Concluído
+                        </Badge>
+                        <div className="font-bold">
+                          {conta.valor.toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL"
+                          })}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 px-2 text-xs"
+                            onClick={() => handleVoltarConta(conta.id)}
+                          >
+                            Colocar de Volta
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Excluir conta</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Tem certeza que deseja excluir esta conta? Esta ação não pode ser desfeita.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleExcluir(conta.id)}>
+                                  Excluir
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-center py-8">
+                  Nenhuma conta concluída ainda.
+                </p>
+              )}
             </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          )}
+        </Card>
     </div>
   );
 };

@@ -293,7 +293,7 @@ const Produto = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-muted/50 py-20">
+      <section style={{ backgroundColor: '#f6f6fa' }} className="py-20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4">
             Pronto para transformar seu e-commerce?
