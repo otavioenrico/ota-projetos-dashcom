@@ -37,17 +37,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             try {
               const hasOrg = await hasOrganization(session.user.id);
               if (!hasOrg) {
-                // Create organization for new user - but handle errors gracefully
+                // Create organization for new user using RPC
                 try {
-                  const newOrgId = await createUserOrganization(
-                    session.user.id, 
-                    `Empresa de ${session.user.email}`
-                  );
+                  const { data: newOrgId, error: rpcError } = await supabase.rpc('create_org_with_owner', {
+                    p_name: `Empresa de ${session.user.email?.split('@')[0] || 'Usuário'}`
+                  });
+                  
+                  if (rpcError) throw rpcError;
+                  
                   setOrgId(newOrgId);
-                  console.log('Organization created:', newOrgId);
+                  console.log('Organization created via RPC:', newOrgId);
+                  
+                  toast({
+                    title: "Bem-vindo!",
+                    description: "Sua organização foi configurada com sucesso.",
+                  });
                 } catch (orgError) {
                   console.error('Error creating organization:', orgError);
-                  // Set a default org ID to prevent infinite loading
+                  toast({
+                    title: "Erro ao configurar organização",
+                    description: "Tente recarregar a página.",
+                    variant: "destructive"
+                  });
                   setOrgId('default-org');
                 }
               } else {

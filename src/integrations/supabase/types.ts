@@ -532,6 +532,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_org_with_owner: {
+        Args: { p_name: string }
+        Returns: string
+      }
       users_in_same_org: {
         Args: { target_user_id: string }
         Returns: boolean

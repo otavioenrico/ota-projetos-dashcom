@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   TrendingUp, 
   Mail,
@@ -50,9 +51,18 @@ const Registrar = () => {
     }
   };
 
-  const handleGoogleSignUp = () => {
-    // Aqui seria implementada a lógica de registro com Google
-    console.log("Registro com Google");
+  const handleGoogleSignUp = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google'
+      });
+      
+      if (error) {
+        setError("Erro ao criar conta com Google. Tente novamente.");
+      }
+    } catch (err) {
+      setError("Erro ao criar conta com Google. Tente novamente.");
+    }
   };
 
   if (isRegistered) {
