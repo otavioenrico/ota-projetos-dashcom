@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Search, Plus, Filter, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,9 +60,11 @@ const fornecedoresMock: Fornecedor[] = [
 ];
 
 export default function Fornecedores() {
-  const [fornecedores, setFornecedores] = useState<Fornecedor[]>(fornecedoresMock);
+  const { orgId } = useAuth();
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [novoFornecedor, setNovoFornecedor] = useState({
     nome: "",
     razaoSocial: "",
@@ -74,6 +78,51 @@ export default function Fornecedores() {
     categoria: ""
   });
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!orgId) return;
+    loadFornecedores();
+  }, [orgId]);
+
+  const loadFornecedores = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('*')
+        .eq('org_id', orgId)
+        .eq('type', 'vendor')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      
+      // Transform Supabase data to match Fornecedor interface
+      const transformedFornecedores = data?.map(contact => ({
+        id: contact.id,
+        nome: contact.name || '',
+        razaoSocial: contact.name || '',
+        cnpj: contact.cnpj || '',
+        email: contact.email || '',
+        telefone: contact.phone || '',
+        whatsapp: contact.phone || '',
+        endereco: contact.address || '',
+        cidade: contact.city || '',
+        uf: contact.state || '',
+        categoria: 'Fornecedor'
+      })) || [];
+
+      setFornecedores(transformedFornecedores);
+    } catch (error) {
+      console.error('Error loading fornecedores:', error);
+      toast({
+        title: "Erro ao carregar fornecedores",
+        description: "Não foi possível carregar a lista de fornecedores.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fornecedoresFiltrados = fornecedores
     .filter(fornecedor =>
@@ -113,7 +162,7 @@ export default function Fornecedores() {
     }
   };
 
-  const handleCadastrarFornecedor = () => {
+  const handleCadastrarFornecedor = async () => {
     if (!novoFornecedor.nome || !novoFornecedor.cnpj) {
       toast({
         title: "Campos obrigatórios",
@@ -123,21 +172,67 @@ export default function Fornecedores() {
       return;
     }
 
-    const fornecedor: Fornecedor = {
-      id: Date.now().toString(),
-      ...novoFornecedor
-    };
+    if (!orgId) {
+      toast({
+        title: "Erro de organização",
+        description: "Crie/Selecione sua organização para continuar.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    setFornecedores(prev => [...prev, fornecedor]);
-    setNovoFornecedor({
-      nome: "", razaoSocial: "", cnpj: "", email: "", telefone: "", whatsapp: "", endereco: "", cidade: "", uf: "", categoria: ""
-    });
-    setIsDialogOpen(false);
-    
-    toast({
-      title: "Fornecedor cadastrado!",
-      description: "Fornecedor foi adicionado com sucesso.",
-    });
+    try {
+      const { data, error } = await supabase
+        .from('contacts')
+        .insert({
+          org_id: orgId,
+          name: novoFornecedor.nome,
+          cnpj: novoFornecedor.cnpj,
+          email: novoFornecedor.email,
+          phone: novoFornecedor.telefone,
+          address: novoFornecedor.endereco,
+          city: novoFornecedor.cidade,
+          state: novoFornecedor.uf,
+          type: 'vendor'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Add to local state
+      const fornecedor: Fornecedor = {
+        id: data.id,
+        nome: novoFornecedor.nome,
+        razaoSocial: novoFornecedor.razaoSocial,
+        cnpj: novoFornecedor.cnpj,
+        email: novoFornecedor.email,
+        telefone: novoFornecedor.telefone,
+        whatsapp: novoFornecedor.whatsapp,
+        endereco: novoFornecedor.endereco,
+        cidade: novoFornecedor.cidade,
+        uf: novoFornecedor.uf,
+        categoria: novoFornecedor.categoria
+      };
+
+      setFornecedores(prev => [fornecedor, ...prev]);
+      setNovoFornecedor({
+        nome: "", razaoSocial: "", cnpj: "", email: "", telefone: "", whatsapp: "", endereco: "", cidade: "", uf: "", categoria: ""
+      });
+      setIsDialogOpen(false);
+      
+      toast({
+        title: "Fornecedor cadastrado!",
+        description: "Fornecedor foi adicionado com sucesso.",
+      });
+    } catch (error) {
+      console.error('Error creating fornecedor:', error);
+      toast({
+        title: "Erro ao cadastrar",
+        description: "Não foi possível cadastrar o fornecedor.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -292,8 +387,23 @@ export default function Fornecedores() {
         </Button>
       </div>
 
-      <div className="grid gap-4">
-        {fornecedoresFiltrados.map((fornecedor) => (
+      {isLoading ? (
+        <div className="grid gap-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-3 bg-muted rounded w-1/2"></div>
+                  <div className="h-3 bg-muted rounded w-1/4"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {fornecedoresFiltrados.map((fornecedor) => (
           <Card key={fornecedor.id}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -333,8 +443,9 @@ export default function Fornecedores() {
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {fornecedoresFiltrados.length === 0 && (
         <Card>

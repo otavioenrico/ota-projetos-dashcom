@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Plus, Filter, ExternalLink } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,9 +57,11 @@ const clientesMock: Cliente[] = [
 ];
 
 export default function Clientes() {
-  const [clientes, setClientes] = useState<Cliente[]>(clientesMock);
+  const { orgId } = useAuth();
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [novoCliente, setNovoCliente] = useState({
     nome: "",
     razaoSocial: "",
@@ -70,6 +74,50 @@ export default function Clientes() {
     uf: ""
   });
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!orgId) return;
+    loadClientes();
+  }, [orgId]);
+
+  const loadClientes = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('*')
+        .eq('org_id', orgId)
+        .eq('type', 'customer')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      
+      // Transform Supabase data to match Cliente interface
+      const transformedClientes = data?.map(contact => ({
+        id: contact.id,
+        nome: contact.name || '',
+        razaoSocial: contact.name || '',
+        cnpj: contact.cnpj || '',
+        email: contact.email || '',
+        telefone: contact.phone || '',
+        whatsapp: contact.phone || '',
+        endereco: contact.address || '',
+        cidade: contact.city || '',
+        uf: contact.state || ''
+      })) || [];
+
+      setClientes(transformedClientes);
+    } catch (error) {
+      console.error('Error loading clientes:', error);
+      toast({
+        title: "Erro ao carregar clientes",
+        description: "Não foi possível carregar a lista de clientes.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const clientesFiltrados = clientes
     .filter(cliente =>
@@ -108,7 +156,7 @@ export default function Clientes() {
     }
   };
 
-  const handleCadastrarCliente = () => {
+  const handleCadastrarCliente = async () => {
     if (!novoCliente.nome || !novoCliente.cnpj) {
       toast({
         title: "Campos obrigatórios",
@@ -118,21 +166,66 @@ export default function Clientes() {
       return;
     }
 
-    const cliente: Cliente = {
-      id: Date.now().toString(),
-      ...novoCliente
-    };
+    if (!orgId) {
+      toast({
+        title: "Erro de organização",
+        description: "Crie/Selecione sua organização para continuar.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    setClientes(prev => [...prev, cliente]);
-    setNovoCliente({
-      nome: "", razaoSocial: "", cnpj: "", email: "", telefone: "", whatsapp: "", endereco: "", cidade: "", uf: ""
-    });
-    setIsDialogOpen(false);
-    
-    toast({
-      title: "Cliente cadastrado!",
-      description: "Cliente foi adicionado com sucesso.",
-    });
+    try {
+      const { data, error } = await supabase
+        .from('contacts')
+        .insert({
+          org_id: orgId,
+          name: novoCliente.nome,
+          cnpj: novoCliente.cnpj,
+          email: novoCliente.email,
+          phone: novoCliente.telefone,
+          address: novoCliente.endereco,
+          city: novoCliente.cidade,
+          state: novoCliente.uf,
+          type: 'customer'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Add to local state
+      const cliente: Cliente = {
+        id: data.id,
+        nome: novoCliente.nome,
+        razaoSocial: novoCliente.razaoSocial,
+        cnpj: novoCliente.cnpj,
+        email: novoCliente.email,
+        telefone: novoCliente.telefone,
+        whatsapp: novoCliente.whatsapp,
+        endereco: novoCliente.endereco,
+        cidade: novoCliente.cidade,
+        uf: novoCliente.uf
+      };
+
+      setClientes(prev => [cliente, ...prev]);
+      setNovoCliente({
+        nome: "", razaoSocial: "", cnpj: "", email: "", telefone: "", whatsapp: "", endereco: "", cidade: "", uf: ""
+      });
+      setIsDialogOpen(false);
+      
+      toast({
+        title: "Cliente cadastrado!",
+        description: "Cliente foi adicionado com sucesso.",
+      });
+    } catch (error) {
+      console.error('Error creating cliente:', error);
+      toast({
+        title: "Erro ao cadastrar",
+        description: "Não foi possível cadastrar o cliente.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -277,8 +370,23 @@ export default function Clientes() {
         </Button>
       </div>
 
-      <div className="grid gap-4">
-        {clientesFiltrados.map((cliente) => (
+      {isLoading ? (
+        <div className="grid gap-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-3 bg-muted rounded w-1/2"></div>
+                  <div className="h-3 bg-muted rounded w-1/4"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {clientesFiltrados.map((cliente) => (
           <Card key={cliente.id}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -315,8 +423,9 @@ export default function Clientes() {
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {clientesFiltrados.length === 0 && (
         <Card>

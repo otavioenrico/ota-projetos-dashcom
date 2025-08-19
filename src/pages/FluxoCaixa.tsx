@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +19,7 @@ import {
 } from "lucide-react";
 
 interface Transacao {
-  id: number;
+  id: string;
   data: string;
   descricao: string;
   categoria: string;
@@ -29,73 +31,110 @@ interface Transacao {
 }
 
 const FluxoCaixa = () => {
+  const { orgId } = useAuth();
   const [showTransactionModal, setShowTransactionModal] = useState(false);
-  const [transacoes, setTransacoes] = useState<Transacao[]>([
-    {
-      id: 1,
-      data: "2024-01-15",
-      descricao: "Venda Online - Loja Virtual",
-      categoria: "Receita",
-      fornecedor: "Mercado Pago",
-      valor: 1250.00,
-      status: "Confirmado",
-      tipo: "entrada"
-    },
-    {
-      id: 2,
-      data: "2024-01-14",
-      descricao: "Compra de Estoque",
-      categoria: "Despesa",
-      fornecedor: "Fornecedor ABC",
-      valor: 850.00,
-      status: "Pago",
-      tipo: "saida"
-    },
-    {
-      id: 3,
-      data: "2024-01-13",
-      descricao: "Taxa da Plataforma",
-      categoria: "Despesa",
-      fornecedor: "Shopify",
-      valor: 129.90,
-      status: "Pago",
-      tipo: "saida"
-    },
-    {
-      id: 4,
-      data: "2024-01-12",
-      descricao: "Venda Presencial",
-      categoria: "Receita",
-      fornecedor: "Loja Física",
-      valor: 780.00,
-      status: "Confirmado",
-      tipo: "entrada"
-    }
-  ]);
-
+  const [transacoes, setTransacoes] = useState<Transacao[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const handleAddTransaction = (newTransaction: any) => {
-    const transaction: Transacao = {
-      id: transacoes.length + 1,
-      data: newTransaction.date,
-      descricao: newTransaction.description,
-      categoria: newTransaction.type === "receita" ? "Receita" : "Despesa",
-      fornecedor: newTransaction.contact,
-      valor: newTransaction.amount,
-      status: "Confirmado",
-      tipo: newTransaction.type === "receita" ? "entrada" : "saida"
-    };
-    
-    setTransacoes([transaction, ...transacoes]);
-    
-    toast({
-      title: "Transação adicionada!",
-      description: "A transação foi registrada com sucesso.",
-    });
+  useEffect(() => {
+    if (!orgId) return;
+    loadTransacoes();
+  }, [orgId]);
+
+  const loadTransacoes = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('org_id', orgId)
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+      
+      // Transform Supabase data to match Transacao interface
+      const transformedTransacoes = data?.map(transaction => ({
+        id: transaction.id,
+        data: transaction.date,
+        descricao: transaction.description,
+        categoria: transaction.kind === 'inflow' ? 'Receita' : 'Despesa',
+        fornecedor: 'Sistema', // You can join with contacts if needed
+        valor: Number(transaction.amount_net || transaction.amount_gross),
+        status: transaction.status,
+        tipo: transaction.kind === 'inflow' ? 'entrada' as const : 'saida' as const,
+        concluido: transaction.status === 'completed'
+      })) || [];
+
+      setTransacoes(transformedTransacoes);
+    } catch (error) {
+      console.error('Error loading transacoes:', error);
+      toast({
+        title: "Erro ao carregar transações",
+        description: "Não foi possível carregar as transações.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleConcluir = (id: number) => {
+  const handleAddTransaction = async (newTransaction: any) => {
+    if (!orgId) {
+      toast({
+        title: "Erro de organização",
+        description: "Crie/Selecione sua organização para continuar.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert({
+          org_id: orgId,
+          description: newTransaction.description,
+          amount_gross: newTransaction.amount,
+          amount_net: newTransaction.amount,
+          date: newTransaction.date,
+          kind: newTransaction.type === "receita" ? "inflow" : "outflow",
+          status: "paid",
+          platform: "manual"
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const transaction: Transacao = {
+        id: data.id,
+        data: newTransaction.date,
+        descricao: newTransaction.description,
+        categoria: newTransaction.type === "receita" ? "Receita" : "Despesa",
+        fornecedor: newTransaction.contact || 'Manual',
+        valor: newTransaction.amount,
+        status: "Confirmado",
+        tipo: newTransaction.type === "receita" ? "entrada" : "saida"
+      };
+      
+      setTransacoes(prev => [transaction, ...prev]);
+      
+      toast({
+        title: "Transação adicionada!",
+        description: "A transação foi registrada com sucesso.",
+      });
+    } catch (error) {
+      console.error('Error adding transaction:', error);
+      toast({
+        title: "Erro ao adicionar transação",
+        description: "Não foi possível registrar a transação.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleConcluir = (id: string) => {
     setTransacoes(transacoes.map(transacao => 
       transacao.id === id 
         ? { ...transacao, concluido: true }
@@ -107,7 +146,7 @@ const FluxoCaixa = () => {
     });
   };
 
-  const handleExcluir = (id: number) => {
+  const handleExcluir = (id: string) => {
     setTransacoes(transacoes.filter(transacao => transacao.id !== id));
     toast({
       title: "Transação excluída!",
@@ -219,8 +258,26 @@ const FluxoCaixa = () => {
           <CardTitle>Transações</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {transacoesAtivas.map((transacao) => (
+          {isLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="animate-pulse flex items-center gap-4">
+                    <div className="w-10 h-10 bg-muted rounded-full"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-muted rounded w-40"></div>
+                      <div className="h-3 bg-muted rounded w-24"></div>
+                    </div>
+                  </div>
+                  <div className="animate-pulse">
+                    <div className="h-6 bg-muted rounded w-20"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {transacoesAtivas.map((transacao) => (
               <div key={transacao.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -287,8 +344,9 @@ const FluxoCaixa = () => {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
