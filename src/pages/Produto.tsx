@@ -23,6 +23,8 @@ const Produto = () => {
     { name: "Mercado Livre", logo: "🛒", category: "Marketplace" },
     { name: "Shopee", logo: "🛍️", category: "Marketplace" },
     { name: "Shein", logo: "👗", category: "Marketplace" },
+    { name: "Amazon", logo: "📦", category: "Marketplace" },
+    { name: "Magazine Luiza", logo: "🏪", category: "Marketplace" },
     { name: "Tiny ERP", logo: "📊", category: "Gestão" },
     { name: "Bling", logo: "💼", category: "Gestão" },
     { name: "Google Ads", logo: "🎯", category: "Marketing" }
@@ -93,32 +95,34 @@ const Produto = () => {
       {/* Navigation */}
       <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl">DashComm</span>
-          </div>
+          </Link>
           
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">
-              Início
-            </Link>
-            <Link to="/produto" className="text-primary font-medium">
-              Produto
-            </Link>
-            <Link to="/planos" className="text-foreground hover:text-primary transition-colors">
-              Planos
-            </Link>
-          </div>
+          <div className="flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-8">
+              <Link to="/" className="text-foreground hover:text-primary transition-colors">
+                Início
+              </Link>
+              <Link to="/produto" className="text-primary font-medium">
+                Produto
+              </Link>
+              <Link to="/planos" className="text-foreground hover:text-primary transition-colors">
+                Planos
+              </Link>
+            </div>
 
-          <div className="flex items-center gap-4">
-            <Button variant="outline" asChild>
-              <Link to="/login">Login</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/registrar">Cadastre-se</Link>
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button variant="outline" asChild>
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/registrar">Cadastre-se</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
@@ -214,27 +218,27 @@ const Produto = () => {
       </section>
 
       {/* Metrics Section */}
-      <section className="bg-primary text-primary-foreground py-20">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               Resultados comprovados
             </h2>
-            <p className="text-xl opacity-90 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Veja o impacto real que o DashComm pode ter no seu negócio
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {metrics.map((metric, index) => (
-              <Card key={index} className="bg-primary-foreground/10 border-primary-foreground/20">
+              <Card key={index}>
                 <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-primary-foreground/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <metric.icon className="w-8 h-8" />
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <metric.icon className="w-8 h-8 text-primary" />
                   </div>
-                  <div className="text-4xl font-bold mb-2">{metric.value}</div>
+                  <div className="text-4xl font-bold text-primary mb-2">{metric.value}</div>
                   <h3 className="font-semibold mb-2">{metric.label}</h3>
-                  <p className="text-sm opacity-80">{metric.description}</p>
+                  <p className="text-sm text-muted-foreground">{metric.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -337,18 +341,16 @@ const Produto = () => {
             <div>
               <h4 className="font-semibold mb-4">Suporte</h4>
               <ul className="space-y-2 text-background/70">
-                <li><a href="#" className="hover:text-background transition-colors">Central de Ajuda</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Contato</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Status</a></li>
+                <li><Link to="/central-ajuda" className="hover:text-background transition-colors">Central de Ajuda</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Empresa</h4>
               <ul className="space-y-2 text-background/70">
-                <li><a href="#" className="hover:text-background transition-colors">Sobre nós</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Política de Privacidade</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Termos de Uso</a></li>
+                <li><Link to="/sobre-nos" className="hover:text-background transition-colors">Sobre nós</Link></li>
+                <li><Link to="/politica-privacidade" className="hover:text-background transition-colors">Política de Privacidade</Link></li>
+                <li><Link to="/termos-uso" className="hover:text-background transition-colors">Termos de Uso</Link></li>
               </ul>
             </div>
           </div>

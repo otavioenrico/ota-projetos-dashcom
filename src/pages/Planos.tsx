@@ -97,32 +97,34 @@ const Planos = () => {
       {/* Navigation */}
       <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl">DashComm</span>
-          </div>
+          </Link>
           
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">
-              Início
-            </Link>
-            <Link to="/produto" className="text-foreground hover:text-primary transition-colors">
-              Produto
-            </Link>
-            <Link to="/planos" className="text-primary font-medium">
-              Planos
-            </Link>
-          </div>
+          <div className="flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-8">
+              <Link to="/" className="text-foreground hover:text-primary transition-colors">
+                Início
+              </Link>
+              <Link to="/produto" className="text-foreground hover:text-primary transition-colors">
+                Produto
+              </Link>
+              <Link to="/planos" className="text-primary font-medium">
+                Planos
+              </Link>
+            </div>
 
-          <div className="flex items-center gap-4">
-            <Button variant="outline" asChild>
-              <Link to="/login">Login</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/registrar">Cadastre-se</Link>
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button variant="outline" asChild>
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/registrar">Cadastre-se</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
@@ -211,43 +213,36 @@ const Planos = () => {
         </div>
       </section>
 
-      {/* Comparison Table */}
-      <section className="bg-muted/50 py-20">
+      {/* Features Section */}
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-              Compare todos os recursos
+              Tudo que você precisa para crescer
             </h2>
             <p className="text-xl text-muted-foreground">
-              Veja em detalhes o que cada plano oferece
+              Recursos completos para gestão do seu e-commerce
             </p>
           </div>
           
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-background rounded-lg shadow-sm overflow-hidden">
-              <div className="grid grid-cols-4 gap-4 p-6 border-b font-semibold">
-                <div>Recursos</div>
-                <div className="text-center">Gratuito</div>
-                <div className="text-center">Mensal</div>
-                <div className="text-center">Anual</div>
-              </div>
-              
-              {[
-                { feature: "Transações por mês", free: "50", monthly: "Ilimitadas", annual: "Ilimitadas" },
-                { feature: "Integrações", free: "1", monthly: "Todas", annual: "Todas + API" },
-                { feature: "Relatórios", free: "Básicos", monthly: "Avançados", annual: "Personalizados" },
-                { feature: "Suporte", free: "Email", monthly: "Prioritário", annual: "Telefônico" },
-                { feature: "Backup", free: "Manual", monthly: "Automático", annual: "Diário" },
-                { feature: "Consultoria", free: "❌", monthly: "❌", annual: "Mensal" }
-              ].map((row, index) => (
-                <div key={index} className="grid grid-cols-4 gap-4 p-6 border-b last:border-b-0">
-                  <div className="font-medium">{row.feature}</div>
-                  <div className="text-center text-muted-foreground">{row.free}</div>
-                  <div className="text-center">{row.monthly}</div>
-                  <div className="text-center font-medium">{row.annual}</div>
-                </div>
-              ))}
-            </div>
+          <div className="max-w-4xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { title: "Integrações Completas", description: "Conecte com Mercado Livre, Shopee, Shein e outros marketplaces" },
+              { title: "Relatórios Avançados", description: "Análises detalhadas para tomada de decisão inteligente" },
+              { title: "Fluxo de Caixa", description: "Controle total das suas receitas e despesas" },
+              { title: "Gestão de Clientes", description: "CRM integrado para relacionamento eficiente" },
+              { title: "Suporte Prioritário", description: "Atendimento especializado quando você precisar" },
+              { title: "Backup Automático", description: "Seus dados sempre seguros e protegidos" }
+            ].map((feature, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle className="text-lg">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -280,19 +275,19 @@ const Planos = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-primary text-primary-foreground py-20">
+      <section className="py-20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4">
             Pronto para começar?
           </h2>
-          <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Teste gratuitamente por 14 dias. Não é necessário cartão de crédito.
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Teste gratuitamente por 7 dias. Não é necessário cartão de crédito.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
+            <Button size="lg" className="text-lg px-8 py-6" asChild>
               <Link to="/registrar">Começar teste gratuito</Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
+            <Button size="lg" variant="outline" className="text-lg px-8 py-6" asChild>
               <Link to="/produto">Conhecer o produto</Link>
             </Button>
           </div>
@@ -327,18 +322,16 @@ const Planos = () => {
             <div>
               <h4 className="font-semibold mb-4">Suporte</h4>
               <ul className="space-y-2 text-background/70">
-                <li><a href="#" className="hover:text-background transition-colors">Central de Ajuda</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Contato</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Status</a></li>
+                <li><Link to="/central-ajuda" className="hover:text-background transition-colors">Central de Ajuda</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Empresa</h4>
               <ul className="space-y-2 text-background/70">
-                <li><a href="#" className="hover:text-background transition-colors">Sobre nós</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Política de Privacidade</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Termos de Uso</a></li>
+                <li><Link to="/sobre-nos" className="hover:text-background transition-colors">Sobre nós</Link></li>
+                <li><Link to="/politica-privacidade" className="hover:text-background transition-colors">Política de Privacidade</Link></li>
+                <li><Link to="/termos-uso" className="hover:text-background transition-colors">Termos de Uso</Link></li>
               </ul>
             </div>
           </div>

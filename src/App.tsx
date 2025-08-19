@@ -13,6 +13,10 @@ import Produto from "./pages/Produto";
 import Planos from "./pages/Planos";
 import Registrar from "./pages/Registrar";
 import Login from "./pages/Login";
+import CentralAjuda from "./pages/CentralAjuda";
+import SobreNos from "./pages/SobreNos";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import TermosUso from "./pages/TermosUso";
 
 // Dashboard pages
 import Dashboard from "./pages/Dashboard";
@@ -22,6 +26,7 @@ import Clientes from "./pages/Clientes";
 import Fornecedores from "./pages/Fornecedores";
 import Relatorios from "./pages/Relatorios";
 import Agenda from "./pages/Agenda";
+import Integracoes from "./pages/Integracoes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +45,10 @@ const App = () => (
           <Route path="/planos" element={<Planos />} />
           <Route path="/registrar" element={<Registrar />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/central-ajuda" element={<CentralAjuda />} />
+          <Route path="/sobre-nos" element={<SobreNos />} />
+          <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
+          <Route path="/termos-uso" element={<TermosUso />} />
           
           {/* Protected Dashboard Routes */}
           <Route path="/dashboard/*" element={
@@ -53,6 +62,7 @@ const App = () => (
                   <Route path="/fornecedores" element={<Fornecedores />} />
                   <Route path="/relatorios" element={<Relatorios />} />
                   <Route path="/agenda" element={<Agenda />} />
+                  <Route path="/integracoes" element={<Integracoes />} />
                 </Routes>
               </DashboardLayout>
             </ProtectedRoute>

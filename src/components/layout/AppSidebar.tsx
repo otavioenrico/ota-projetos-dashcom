@@ -13,7 +13,8 @@ import {
   LogOut,
   User,
   Menu,
-  CreditCard as CardIcon
+  CreditCard as CardIcon,
+  Plug
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -47,6 +48,7 @@ const mainItems = [
   { title: "Fornecedores", url: "/dashboard/fornecedores", icon: Building2 },
   { title: "Relatórios", url: "/dashboard/relatorios", icon: BarChart3 },
   { title: "Agenda", url: "/dashboard/agenda", icon: Calendar },
+  { title: "Integrações", url: "/dashboard/integracoes", icon: Plug },
 ];
 
 export function AppSidebar() {
