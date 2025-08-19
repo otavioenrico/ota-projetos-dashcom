@@ -12,6 +12,7 @@ import { Upload, FileText } from "lucide-react";
 interface TransactionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSubmit?: (data: any) => void;
 }
 
 interface TransactionForm {
@@ -24,7 +25,7 @@ interface TransactionForm {
   file?: FileList;
 }
 
-export function TransactionModal({ open, onOpenChange }: TransactionModalProps) {
+export function TransactionModal({ open, onOpenChange, onSubmit: onSubmitProp }: TransactionModalProps) {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   
@@ -39,7 +40,11 @@ export function TransactionModal({ open, onOpenChange }: TransactionModalProps) 
 
   const onSubmit = async (data: TransactionForm) => {
     console.log("Transaction data:", data);
-    // TODO: Integrate with Supabase to save transaction
+    
+    if (onSubmitProp) {
+      onSubmitProp(data);
+    }
+    
     onOpenChange(false);
     reset();
     setUploadedFile(null);

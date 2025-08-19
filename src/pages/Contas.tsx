@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -30,70 +31,67 @@ interface Conta {
   fornecedor: string;
   valor: number;
   dataVencimento: string;
-  status: "pendente" | "pago" | "vencido";
+  status: "pendente" | "pago" | "vencido" | "concluido";
   categoria: string;
   parcela?: string;
   observacoes?: string;
 }
 
-const contasPagar: Conta[] = [
-  {
-    id: 1,
-    descricao: "Fornecedor ABC - Estoque",
-    fornecedor: "Fornecedor ABC Ltda",
-    valor: 2500.00,
-    dataVencimento: "2024-01-20",
-    status: "pendente",
-    categoria: "Fornecedores",
-    parcela: "1/4",
-    observacoes: "Pagamento parcelado em 4x"
-  },
-  {
-    id: 2,
-    descricao: "Aluguel da Loja",
-    fornecedor: "Imobiliária Silva",
-    valor: 3200.00,
-    dataVencimento: "2024-01-15",
-    status: "pago",
-    categoria: "Fixas",
-  },
-  {
-    id: 3,
-    descricao: "Conta de Energia",
-    fornecedor: "Companhia Elétrica",
-    valor: 480.50,
-    dataVencimento: "2024-01-12",
-    status: "vencido",
-    categoria: "Utilitários",
-  }
-];
-
-const contasReceber: Conta[] = [
-  {
-    id: 4,
-    descricao: "Venda Cliente XYZ",
-    fornecedor: "Cliente XYZ Ltda",
-    valor: 4500.00,
-    dataVencimento: "2024-01-25",
-    status: "pendente",
-    categoria: "Vendas",
-    parcela: "2/3"
-  },
-  {
-    id: 5,
-    descricao: "Serviço de Consultoria",
-    fornecedor: "Empresa DEF",
-    valor: 1800.00,
-    dataVencimento: "2024-01-18",
-    status: "pendente",
-    categoria: "Serviços",
-  }
-];
-
 const Contas = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [contas, setContas] = useState<Conta[]>([
+    {
+      id: 1,
+      descricao: "Fornecedor ABC - Estoque",
+      fornecedor: "Fornecedor ABC Ltda",
+      valor: 2500.00,
+      dataVencimento: "2024-01-20",
+      status: "pendente",
+      categoria: "Fornecedores",
+      parcela: "1/4",
+      observacoes: "Pagamento parcelado em 4x"
+    },
+    {
+      id: 2,
+      descricao: "Aluguel da Loja",
+      fornecedor: "Imobiliária Silva",
+      valor: 3200.00,
+      dataVencimento: "2024-01-15",
+      status: "pago",
+      categoria: "Fixas",
+    },
+    {
+      id: 3,
+      descricao: "Conta de Energia",
+      fornecedor: "Companhia Elétrica",
+      valor: 480.50,
+      dataVencimento: "2024-01-12",
+      status: "vencido",
+      categoria: "Utilitários",
+    },
+    {
+      id: 4,
+      descricao: "Venda Cliente XYZ",
+      fornecedor: "Cliente XYZ Ltda",
+      valor: 4500.00,
+      dataVencimento: "2024-01-25",
+      status: "pendente",
+      categoria: "Vendas",
+      parcela: "2/3"
+    },
+    {
+      id: 5,
+      descricao: "Serviço de Consultoria",
+      fornecedor: "Empresa DEF",
+      valor: 1800.00,
+      dataVencimento: "2024-01-18",
+      status: "pendente",
+      categoria: "Serviços",
+    }
+  ]);
+  
   const { toast } = useToast();
   
   const form = useForm({
@@ -120,7 +118,7 @@ const Contas = () => {
         form.setValue("fornecedor", "Fornecedor XYZ Ltda");
         form.setValue("valor", "1200.00");
         form.setValue("dataVencimento", "2024-02-15");
-        form.setValue("categoria", "Fornecedores");
+        form.setValue("categoria", "fornecedores");
         form.setValue("parcelas", "3");
         toast({
           title: "Boleto processado!",
@@ -131,7 +129,20 @@ const Contas = () => {
   };
 
   const onSubmit = (data: any) => {
-    console.log("Cadastrando conta:", data);
+    const novaConta: Conta = {
+      id: contas.length + 1,
+      descricao: data.descricao,
+      fornecedor: data.fornecedor,
+      valor: parseFloat(data.valor),
+      dataVencimento: data.dataVencimento,
+      status: "pendente",
+      categoria: data.categoria,
+      parcela: data.parcelas !== "1" ? `1/${data.parcelas}` : undefined,
+      observacoes: data.observacoes
+    };
+    
+    setContas([...contas, novaConta]);
+    
     toast({
       title: "Conta cadastrada!",
       description: "A conta foi adicionada com sucesso.",
@@ -139,6 +150,26 @@ const Contas = () => {
     setIsDialogOpen(false);
     form.reset();
     setSelectedFile(null);
+  };
+
+  const handleConcluir = (id: number) => {
+    setContas(contas.map(conta => 
+      conta.id === id 
+        ? { ...conta, status: "concluido" as const }
+        : conta
+    ));
+    toast({
+      title: "Conta concluída!",
+      description: "A conta foi movida para a lista de concluídos.",
+    });
+  };
+
+  const handleExcluir = (id: number) => {
+    setContas(contas.filter(conta => conta.id !== id));
+    toast({
+      title: "Conta excluída!",
+      description: "A conta foi excluída com sucesso.",
+    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -149,6 +180,8 @@ const Contas = () => {
         return <Badge variant="outline">Pendente</Badge>;
       case "vencido":
         return <Badge className="bg-destructive/10 text-destructive border-destructive/20">Vencido</Badge>;
+      case "concluido":
+        return <Badge className="bg-success/10 text-success border-success/20">Concluído</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -157,6 +190,7 @@ const Contas = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pago":
+      case "concluido":
         return <CheckCircle className="h-4 w-4 text-success" />;
       case "pendente":
         return <Clock className="h-4 w-4 text-warning" />;
@@ -167,7 +201,19 @@ const Contas = () => {
     }
   };
 
-  const renderContasTable = (contas: Conta[], tipo: "pagar" | "receber" | "todas") => (
+  const contasPagar = contas.filter(conta => 
+    ["Fornecedores", "Fixas", "Utilitários"].includes(conta.categoria) && conta.status !== "concluido"
+  );
+  
+  const contasReceber = contas.filter(conta => 
+    ["Vendas", "Serviços"].includes(conta.categoria) && conta.status !== "concluido"
+  );
+
+  const contasConcluidas = contas.filter(conta => conta.status === "concluido");
+  
+  const todasContas = contas.filter(conta => conta.status !== "concluido");
+
+  const renderContasTable = (contasData: Conta[], tipo: "pagar" | "receber" | "todas" | "concluidas") => (
     <Table>
       <TableHeader>
         <TableRow>
@@ -182,7 +228,7 @@ const Contas = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {contas.map((conta) => (
+        {contasData.map((conta) => (
           <TableRow key={conta.id}>
             <TableCell>
               <div className="flex items-center gap-2">
@@ -210,12 +256,37 @@ const Contas = () => {
             </TableCell>
             <TableCell className="text-right">
               <div className="flex items-center justify-end gap-2">
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                  <CheckCircle className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {conta.status !== "concluido" && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0"
+                    onClick={() => handleConcluir(conta.id)}
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                  </Button>
+                )}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Excluir conta</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Tem certeza que deseja excluir esta conta? Esta ação não pode ser desfeita.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleExcluir(conta.id)}>
+                        Excluir
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </TableCell>
           </TableRow>
@@ -374,12 +445,12 @@ const Contas = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="fornecedores">Fornecedores</SelectItem>
-                          <SelectItem value="fixas">Despesas Fixas</SelectItem>
-                          <SelectItem value="utilitarios">Utilitários</SelectItem>
-                          <SelectItem value="vendas">Vendas</SelectItem>
-                          <SelectItem value="servicos">Serviços</SelectItem>
-                          <SelectItem value="outros">Outros</SelectItem>
+                          <SelectItem value="Fornecedores">Fornecedores</SelectItem>
+                          <SelectItem value="Fixas">Despesas Fixas</SelectItem>
+                          <SelectItem value="Utilitários">Utilitários</SelectItem>
+                          <SelectItem value="Vendas">Vendas</SelectItem>
+                          <SelectItem value="Serviços">Serviços</SelectItem>
+                          <SelectItem value="Outros">Outros</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -421,8 +492,13 @@ const Contas = () => {
             <DollarSign className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">R$ 6.180,50</div>
-            <p className="text-xs text-muted-foreground">3 contas pendentes</p>
+            <div className="text-2xl font-bold text-destructive">
+              {contasPagar.reduce((total, conta) => total + conta.valor, 0).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">{contasPagar.length} contas pendentes</p>
           </CardContent>
         </Card>
         
@@ -432,8 +508,13 @@ const Contas = () => {
             <DollarSign className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-success">R$ 6.300,00</div>
-            <p className="text-xs text-muted-foreground">2 contas pendentes</p>
+            <div className="text-2xl font-bold text-success">
+              {contasReceber.reduce((total, conta) => total + conta.valor, 0).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">{contasReceber.length} contas pendentes</p>
           </CardContent>
         </Card>
         
@@ -473,41 +554,35 @@ const Contas = () => {
                 />
               </div>
             </div>
-            <Select>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filtrar por status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos</SelectItem>
-                <SelectItem value="pendente">Pendente</SelectItem>
-                <SelectItem value="pago">Pago</SelectItem>
-                <SelectItem value="vencido">Vencido</SelectItem>
-              </SelectContent>
-            </Select>
+            <Button variant="outline">
+              <Calendar className="mr-2 h-4 w-4" />
+              Filtrar por data
+            </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Tabelas de Contas */}
-      <Tabs defaultValue="todas" className="space-y-4">
-        <TabsList>
+      {/* Tabelas */}
+      <Tabs defaultValue="todas" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="todas">Todas as Contas</TabsTrigger>
           <TabsTrigger value="pagar">Contas a Pagar</TabsTrigger>
           <TabsTrigger value="receber">Contas a Receber</TabsTrigger>
+          <TabsTrigger value="concluidas">Concluídas</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="todas">
+        <TabsContent value="todas" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Todas as Contas</CardTitle>
             </CardHeader>
             <CardContent>
-              {renderContasTable([...contasPagar, ...contasReceber], "todas")}
+              {renderContasTable(todasContas, "todas")}
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="pagar">
+        
+        <TabsContent value="pagar" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Contas a Pagar</CardTitle>
@@ -518,13 +593,24 @@ const Contas = () => {
           </Card>
         </TabsContent>
         
-        <TabsContent value="receber">
+        <TabsContent value="receber" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Contas a Receber</CardTitle>
             </CardHeader>
             <CardContent>
               {renderContasTable(contasReceber, "receber")}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="concluidas" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Contas Concluídas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {renderContasTable(contasConcluidas, "concluidas")}
             </CardContent>
           </Card>
         </TabsContent>

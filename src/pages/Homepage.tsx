@@ -120,7 +120,7 @@ const Homepage = () => {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[800px]">
+        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[560px]">
           <div className="space-y-6">
             <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
               Pare de perder tempo com planilhas.
