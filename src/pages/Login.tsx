@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   TrendingUp, 
   Eye,
@@ -47,10 +48,18 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    // Aqui seria implementada a lógica de login com Google
-    console.log("Login com Google");
-    navigate("/dashboard");
+  const handleGoogleLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google'
+      });
+      
+      if (error) {
+        setError("Erro ao fazer login com Google. Tente novamente.");
+      }
+    } catch (err) {
+      setError("Erro ao fazer login com Google. Tente novamente.");
+    }
   };
 
   return (
