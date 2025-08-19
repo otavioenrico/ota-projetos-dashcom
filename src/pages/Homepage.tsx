@@ -93,19 +93,20 @@ const Homepage = () => {
             <span className="font-bold text-xl">DashComm</span>
           </div>
           
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">
-              Início
-            </Link>
-            <Link to="/produto" className="text-foreground hover:text-primary transition-colors">
-              Produto
-            </Link>
-            <Link to="/planos" className="text-foreground hover:text-primary transition-colors">
-              Planos
-            </Link>
-          </div>
+          <div className="flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-8">
+              <Link to="/" className="text-foreground hover:text-primary transition-colors">
+                Início
+              </Link>
+              <Link to="/produto" className="text-foreground hover:text-primary transition-colors">
+                Produto
+              </Link>
+              <Link to="/planos" className="text-foreground hover:text-primary transition-colors">
+                Planos
+              </Link>
+            </div>
 
-          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4">
             <Button variant="outline" asChild>
               <Link to="/login">Login</Link>
             </Button>
@@ -134,8 +135,8 @@ const Homepage = () => {
           <div className="relative">
             <div className="relative rounded-2xl overflow-hidden">
               <img 
-                src="/src/assets/hero-woman-laptop.jpg" 
-                alt="Mulher de óculos trabalhando em laptop com dashboards financeiros" 
+                src="/src/assets/hero-woman-dashboard.jpg" 
+                alt="Profissional trabalhando com dashboard de vendas e notificações de faturamento" 
                 className="w-full h-auto"
               />
               
@@ -289,18 +290,16 @@ const Homepage = () => {
             <div>
               <h4 className="font-semibold mb-4">Suporte</h4>
               <ul className="space-y-2 text-background/70">
-                <li><a href="#" className="hover:text-background transition-colors">Central de Ajuda</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Contato</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Status</a></li>
+                <li><Link to="/central-ajuda" className="hover:text-background transition-colors">Central de Ajuda</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Empresa</h4>
               <ul className="space-y-2 text-background/70">
-                <li><a href="#" className="hover:text-background transition-colors">Sobre nós</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Política de Privacidade</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Termos de Uso</a></li>
+                <li><Link to="/sobre-nos" className="hover:text-background transition-colors">Sobre nós</Link></li>
+                <li><Link to="/politica-privacidade" className="hover:text-background transition-colors">Política de Privacidade</Link></li>
+                <li><Link to="/termos-uso" className="hover:text-background transition-colors">Termos de Uso</Link></li>
               </ul>
             </div>
           </div>
