@@ -20,7 +20,8 @@ import {
   CheckCircle,
   Clock,
   FileText,
-  Search
+  Search,
+  Trash2
 } from "lucide-react";
 
 interface Conta {
@@ -166,17 +167,18 @@ const Contas = () => {
     }
   };
 
-  const renderContasTable = (contas: Conta[], tipo: "pagar" | "receber") => (
+  const renderContasTable = (contas: Conta[], tipo: "pagar" | "receber" | "todas") => (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Status</TableHead>
           <TableHead>Descrição</TableHead>
-          <TableHead>{tipo === "pagar" ? "Fornecedor" : "Cliente"}</TableHead>
+          <TableHead>{tipo === "pagar" ? "Fornecedor" : tipo === "receber" ? "Cliente" : "Fornecedor/Cliente"}</TableHead>
           <TableHead>Categoria</TableHead>
           <TableHead>Vencimento</TableHead>
           <TableHead>Parcela</TableHead>
           <TableHead className="text-right">Valor</TableHead>
+          <TableHead className="text-right">Ações</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -205,6 +207,16 @@ const Contas = () => {
                 style: "currency",
                 currency: "BRL"
               })}
+            </TableCell>
+            <TableCell className="text-right">
+              <div className="flex items-center justify-end gap-2">
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                  <CheckCircle className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
         ))}
@@ -477,12 +489,24 @@ const Contas = () => {
       </Card>
 
       {/* Tabelas de Contas */}
-      <Tabs defaultValue="pagar" className="space-y-4">
+      <Tabs defaultValue="todas" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="todas">Todas as Contas</TabsTrigger>
           <TabsTrigger value="pagar">Contas a Pagar</TabsTrigger>
           <TabsTrigger value="receber">Contas a Receber</TabsTrigger>
         </TabsList>
         
+        <TabsContent value="todas">
+          <Card>
+            <CardHeader>
+              <CardTitle>Todas as Contas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {renderContasTable([...contasPagar, ...contasReceber], "todas")}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="pagar">
           <Card>
             <CardHeader>

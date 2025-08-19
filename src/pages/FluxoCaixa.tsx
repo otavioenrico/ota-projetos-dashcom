@@ -9,7 +9,9 @@ import {
   ArrowUpCircle, 
   ArrowDownCircle, 
   Search,
-  Filter
+  Filter,
+  CheckCircle,
+  Trash2
 } from "lucide-react";
 
 const transacoes = [
@@ -170,6 +172,14 @@ const FluxoCaixa = () => {
                       style: "currency",
                       currency: "BRL"
                     })}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                      <CheckCircle className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               </div>
