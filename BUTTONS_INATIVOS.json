@@ -1,0 +1,240 @@
+{
+  "critical_inactive_buttons": [
+    {
+      "file": "src/pages/Homepage.tsx",
+      "line": 94,
+      "element": "Button",
+      "text": "Saiba Mais",
+      "selector": ".bg-secondary.text-secondary-foreground",
+      "issue": "href=\"#\" sem ação real",
+      "current_code": "<Link to=\"#\" className=\"...\">",
+      "suggested_action": "Alterar para <Link to=\"/produto\"> para direcionar à página de produto",
+      "priority": "P0",
+      "impact": "Quebra do fluxo principal de conversão",
+      "effort": "1 linha - 5min"
+    },
+    {
+      "file": "src/pages/Login.tsx", 
+      "line": 52,
+      "element": "Button",
+      "text": "Continuar com Google",
+      "selector": ".w-full.bg-white",
+      "issue": "onClick com console.log mock",
+      "current_code": "const handleGoogleLogin = () => { console.log(\"Login com Google\"); navigate(\"/dashboard\"); };",
+      "suggested_action": "Implementar OAuth com Google via Supabase Auth",
+      "priority": "P0", 
+      "impact": "Funcionalidade principal de auth não funciona",
+      "effort": "4-8h - Configuração OAuth completa"
+    },
+    {
+      "file": "src/pages/Registrar.tsx",
+      "line": 55, 
+      "element": "Button",
+      "text": "Continuar com Google",
+      "selector": ".w-full.bg-white",
+      "issue": "onClick com console.log mock",
+      "current_code": "const handleGoogleSignUp = () => { console.log(\"Registro com Google\"); };",
+      "suggested_action": "Implementar OAuth com Google via Supabase Auth",
+      "priority": "P0",
+      "impact": "Funcionalidade principal de registro não funciona", 
+      "effort": "4-8h - Configuração OAuth completa"
+    }
+  ],
+  "important_inactive_buttons": [
+    {
+      "file": "src/components/settings/SettingsDialog.tsx",
+      "line": 52,
+      "element": "Button", 
+      "text": "Salvar",
+      "selector": "Button",
+      "issue": "onClick apenas faz console.log",
+      "current_code": "const handleSave = () => { console.log(\"Salvando configurações:\", formData); onOpenChange(false); };",
+      "suggested_action": "Implementar API call para salvar configurações no Supabase",
+      "priority": "P1",
+      "impact": "Funcionalidade de configurações não persiste dados",
+      "effort": "2-4h - CRUD de configurações"
+    },
+    {
+      "file": "src/components/settings/SubscriptionDialog.tsx",
+      "line": 65,
+      "element": "Button",
+      "text": "Assinar Plano",
+      "selector": "Button", 
+      "issue": "onClick apenas faz console.log",
+      "current_code": "const handleSubscribe = () => { console.log(\"Processando assinatura:\", { selectedPlan, paymentMethod, cardData }); };",
+      "suggested_action": "Integrar com gateway de pagamento (Stripe/PagSeguro)",
+      "priority": "P1",
+      "impact": "Monetização não funciona",
+      "effort": "8-16h - Integração completa de pagamento"
+    },
+    {
+      "file": "src/components/modals/TransactionModal.tsx",
+      "line": 98,
+      "element": "Button",
+      "text": "Anexar Comprovante", 
+      "selector": ".w-full.border-dashed",
+      "issue": "onClick delega para input file mas sem handler de upload",
+      "current_code": "onClick={() => document.getElementById('file-upload')?.click()}",
+      "suggested_action": "Implementar upload para Supabase Storage",
+      "priority": "P1", 
+      "impact": "Funcionalidade de anexos não funciona",
+      "effort": "4-6h - Storage + políticas RLS"
+    }
+  ],
+  "minor_inactive_elements": [
+    {
+      "file": "src/pages/CentralAjuda.tsx",
+      "line": 359,
+      "element": "Link",
+      "text": "Integrações",
+      "selector": "footer a",
+      "issue": "href=\"#\" sem destino",
+      "current_code": "<a href=\"#\" className=\"...\">Integrações</a>",
+      "suggested_action": "Criar página de integrações ou remover link",
+      "priority": "P2",
+      "impact": "Link quebrado no footer",
+      "effort": "15min - Correção de link"
+    },
+    {
+      "file": "src/pages/Fornecedores.tsx",
+      "line": 45,
+      "element": "Button", 
+      "text": "Cadastrar Fornecedor",
+      "selector": ".bg-primary",
+      "issue": "Modal abre mas submissão é mock",
+      "current_code": "const handleCadastrarFornecedor = () => { console.log(\"Cadastrando fornecedor:\", novoFornecedor); };",
+      "suggested_action": "Implementar inserção no Supabase",
+      "priority": "P2",
+      "impact": "CRUD não persiste dados",
+      "effort": "2-3h - API + validação"
+    },
+    {
+      "file": "src/pages/Clientes.tsx", 
+      "line": 45,
+      "element": "Button",
+      "text": "Cadastrar Cliente",
+      "selector": ".bg-primary",
+      "issue": "Modal abre mas submissão é mock", 
+      "current_code": "const handleCadastrarCliente = () => { console.log(\"Cadastrando cliente:\", novoCliente); };",
+      "suggested_action": "Implementar inserção no Supabase",
+      "priority": "P2",
+      "impact": "CRUD não persiste dados",
+      "effort": "2-3h - API + validação"
+    },
+    {
+      "file": "src/pages/Agenda.tsx",
+      "line": 257,
+      "element": "Button",
+      "text": "Criar Evento", 
+      "selector": "Button",
+      "issue": "Modal abre mas submissão é mock",
+      "current_code": "const handleCriarEvento = () => { console.log(\"Criando evento:\", novoEvento); };",
+      "suggested_action": "Implementar inserção na tabela calendar_events",
+      "priority": "P2", 
+      "impact": "Funcionalidade de agenda não persiste",
+      "effort": "2-3h - CRUD de eventos"
+    }
+  ],
+  "placeholder_elements": [
+    {
+      "file": "src/pages/Dashboard.tsx",
+      "line": 182,
+      "element": "div",
+      "text": "Gráfico do fluxo de caixa será implementado aqui",
+      "issue": "Placeholder sem funcionalidade",
+      "suggested_action": "Implementar gráfico com Recharts usando dados reais",
+      "priority": "P2",
+      "effort": "4-6h - Gráfico + queries"
+    },
+    {
+      "file": "src/pages/Relatorios.tsx",
+      "line": 156,
+      "element": "div", 
+      "text": "Em breve: Relatórios detalhados",
+      "issue": "Página com conteúdo placeholder",
+      "suggested_action": "Implementar relatórios reais com filtros e exportação",
+      "priority": "P2",
+      "effort": "16-24h - Relatórios completos"
+    },
+    {
+      "file": "src/pages/Integracoes.tsx",
+      "line": 89,
+      "element": "div",
+      "text": "Em breve: Integrações com bancos e e-commerces",
+      "issue": "Página com conteúdo placeholder", 
+      "suggested_action": "Implementar integrações reais (API bancária, webhooks)",
+      "priority": "P3",
+      "effort": "40-80h - Integrações complexas"
+    }
+  ],
+  "disabled_buttons_analysis": [
+    {
+      "file": "src/components/ui/carousel.tsx",
+      "lines": [213, 242],
+      "elements": ["Button prev", "Button next"],
+      "issue": "disabled={!canScrollPrev/Next}",
+      "status": "✅ CORRETO - Disabled state adequado",
+      "action": "Nenhuma - funcionamento esperado"
+    },
+    {
+      "file": "src/components/ui/breadcrumb.tsx", 
+      "line": 67,
+      "element": "a",
+      "issue": "aria-disabled=\"true\"",
+      "status": "✅ CORRETO - Acessibilidade adequada",
+      "action": "Nenhuma - funcionamento esperado"
+    }
+  ],
+  "form_submissions": [
+    {
+      "file": "src/pages/Login.tsx",
+      "line": 77,
+      "form": "login",
+      "status": "✅ FUNCIONAL",
+      "validation": "React Hook Form + Zod",
+      "submit_handler": "handleLogin - Supabase Auth"
+    },
+    {
+      "file": "src/pages/Registrar.tsx", 
+      "line": 89,
+      "form": "register",
+      "status": "✅ FUNCIONAL", 
+      "validation": "React Hook Form + Zod",
+      "submit_handler": "handleSignUp - Supabase Auth"
+    },
+    {
+      "file": "src/components/modals/TransactionModal.tsx",
+      "line": 77,
+      "form": "transaction",
+      "status": "⚠️ PARCIAL",
+      "validation": "React Hook Form",
+      "submit_handler": "onSubmit - apenas console.log, sem persistência"
+    },
+    {
+      "file": "src/pages/CentralAjuda.tsx",
+      "line": 182,
+      "form": "contact", 
+      "status": "⚠️ PARCIAL",
+      "validation": "Básica",
+      "submit_handler": "handleSubmit - preventDefault apenas"
+    }
+  ],
+  "summary": {
+    "total_inactive_buttons": 10,
+    "critical_p0": 3,
+    "important_p1": 3, 
+    "minor_p2": 4,
+    "total_effort_estimate": "45-75 horas",
+    "immediate_fixes_needed": [
+      "Homepage 'Saiba Mais' button",
+      "Google OAuth implementation", 
+      "Settings persistence",
+      "Payment integration"
+    ],
+    "quick_wins": [
+      "Fix href='#' links (5-15min each)",
+      "Add proper navigation (1h total)",
+      "Console.log to API calls (2-4h each)"
+    ]
+  }
+}

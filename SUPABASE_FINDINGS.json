@@ -1,0 +1,280 @@
+{
+  "security_findings": {
+    "rls_violations": [
+      {
+        "severity": "HIGH",
+        "table": "organizations", 
+        "issue": "RLS policy violation during organization creation",
+        "file": "src/contexts/AuthContext.tsx",
+        "line": 49,
+        "error_message": "new row violates row-level security policy for table \"organizations\"",
+        "current_policy": "Users can insert organizations WITH CHECK (true)",
+        "problem": "Policy permite inserção mas auth.uid() pode estar null durante signup",
+        "suggested_fix": "Verificar se user está autenticado antes de criar org ou ajustar política",
+        "risk": "Usuários não conseguem completar onboarding"
+      }
+    ],
+    "missing_org_filters": [],
+    "service_role_usage": [],
+    "exposed_policies": []
+  },
+  "query_analysis": {
+    "queries_without_org_filter": [],
+    "queries_with_proper_filtering": [
+      {
+        "file": "src/lib/kpis.ts",
+        "lines": [11, 28, 59, 70, 83, 99, 112, 128],
+        "tables": ["transactions", "bills", "activity_logs", "contacts"],
+        "status": "✅ CORRECT - All queries properly filter by org_id"
+      },
+      {
+        "file": "src/lib/supabaseClient.ts", 
+        "lines": [20, 40, 49, 64],
+        "tables": ["memberships", "organizations"],
+        "status": "✅ CORRECT - User-based filtering implemented"
+      }
+    ],
+    "n_plus_one_problems": [
+      {
+        "severity": "MEDIUM",
+        "file": "src/pages/Dashboard.tsx",
+        "lines": "43-92",
+        "issue": "8 separate queries executed in parallel for dashboard data",
+        "queries": [
+          "getMonthlyRevenue",
+          "getAccountsReceivable", 
+          "getAccountsPayable",
+          "getNewCustomersThisMonth",
+          "getDeltaVsPrevMonth (revenue)",
+          "getDeltaVsPrevMonth (expenses)", 
+          "getUpcomingBills",
+          "getRecentActivities"
+        ],
+        "optimization": "Could be combined into fewer queries or use views",
+        "performance_impact": "Multiple round trips, but parallelized with Promise.all"
+      }
+    ]
+  },
+  "error_handling": {
+    "missing_error_handling": [
+      {
+        "file": "src/lib/kpis.ts",
+        "functions": ["getMonthlyRevenue", "getAccountsReceivable", "getAccountsPayable"],
+        "issue": "Queries não usam .throwOnError() e não tratam erros",
+        "risk": "Silent failures, undefined behavior on network errors",
+        "suggested_fix": "Adicionar .throwOnError() e try/catch blocks"
+      }
+    ],
+    "inadequate_error_handling": [
+      {
+        "file": "src/contexts/AuthContext.tsx",
+        "line": 49,
+        "issue": "Generic error handling com fallback para 'default-org'", 
+        "risk": "Pode quebrar RLS se default-org não existir",
+        "current_code": "setOrgId('default-org');",
+        "suggested_fix": "Implementar retry logic ou redirect para página de setup"
+      }
+    ]
+  },
+  "performance_issues": {
+    "inefficient_queries": [
+      {
+        "file": "src/lib/kpis.ts",
+        "function": "getDeltaVsPrevMonth",
+        "issue": "Função chamada duas vezes com diferentes parâmetros",
+        "optimization": "Combinar em uma query que retorna ambos os tipos",
+        "impact": "2x round trips desnecessários"
+      }
+    ],
+    "missing_indexes": [
+      {
+        "table": "transactions", 
+        "columns": ["org_id", "date", "kind", "status"],
+        "query_pattern": ".eq('org_id', orgId).eq('kind', 'inflow').in('status', ['paid', 'received'])",
+        "suggestion": "CREATE INDEX ON transactions (org_id, kind, status, date)"
+      },
+      {
+        "table": "bills",
+        "columns": ["org_id", "board", "status", "due_date"],
+        "query_pattern": ".eq('org_id', orgId).eq('board', 'receivables').eq('status', 'pending')",
+        "suggestion": "CREATE INDEX ON bills (org_id, board, status, due_date)"
+      }
+    ]
+  },
+  "data_consistency": {
+    "proper_relations": [
+      {
+        "query": "src/lib/kpis.ts:83-89",
+        "tables": "bills + contacts + categories",
+        "status": "✅ CORRECT - Using proper joins with foreign keys"
+      }
+    ],
+    "transaction_safety": [
+      {
+        "file": "src/lib/supabaseClient.ts",
+        "function": "createUserOrganization", 
+        "issue": "Organization creation + membership insertion not wrapped in transaction",
+        "risk": "Partial failures could leave orphaned organizations",
+        "suggested_fix": "Use Supabase RPC with transaction or implement retry logic"
+      }
+    ]
+  },
+  "storage_usage": {
+    "buckets_created": [],
+    "missing_policies": [
+      {
+        "feature": "File upload in TransactionModal",
+        "file": "src/components/modals/TransactionModal.tsx",
+        "line": 98,
+        "issue": "File upload UI exists but no Storage bucket/policies configured",
+        "suggested_buckets": ["transaction-attachments"],
+        "required_policies": [
+          "Users can upload files to their org folder",
+          "Users can view files from their org folder"
+        ]
+      }
+    ]
+  },
+  "auth_integration": {
+    "session_management": [
+      {
+        "file": "src/contexts/AuthContext.tsx",
+        "status": "✅ GOOD - Proper auth state listener and session persistence",
+        "features": [
+          "onAuthStateChange listener",
+          "Session persistence",
+          "Organization auto-creation",
+          "Loading states"
+        ]
+      }
+    ],
+    "token_handling": [
+      {
+        "status": "✅ GOOD - Using Supabase SDK, no manual token management"
+      }
+    ]
+  },
+  "type_safety": {
+    "generated_types": [
+      {
+        "file": "src/integrations/supabase/types.ts", 
+        "status": "✅ GOOD - Auto-generated from database schema",
+        "usage": "Imported in supabaseClient.ts"
+      }
+    ],
+    "type_usage": [
+      {
+        "file": "src/lib/supabaseClient.ts",
+        "status": "✅ GOOD - Proper TypeScript types from @supabase/supabase-js"
+      }
+    ]
+  },
+  "logging_and_monitoring": {
+    "production_logs": [
+      {
+        "file": "src/contexts/AuthContext.tsx",
+        "lines": [30, 47, 57, 80],
+        "issue": "console.log statements in production code",
+        "suggested_fix": "Remove or use proper logging service",
+        "security_risk": "Auth events being logged to browser console"
+      }
+    ],
+    "error_tracking": [
+      {
+        "status": "❌ MISSING - No error tracking service (Sentry, etc.)",
+        "suggestion": "Implement error monitoring for production"
+      }
+    ]
+  },
+  "real_time_features": {
+    "subscriptions": [
+      {
+        "status": "❌ NOT_USED - No real-time subscriptions implemented",
+        "opportunities": [
+          "Dashboard KPIs could update in real-time",
+          "Transaction lists could show live updates",
+          "Notifications for new bills/events"
+        ]
+      }
+    ]
+  },
+  "edge_functions": {
+    "usage": [
+      {
+        "status": "❌ NOT_USED - No Edge Functions implemented",
+        "opportunities": [
+          "Payment processing webhooks",
+          "Email notifications",
+          "Data aggregation/reporting",
+          "Third-party API integrations"
+        ]
+      }
+    ]
+  },
+  "recommendations": {
+    "immediate_fixes": [
+      {
+        "priority": "P0",
+        "item": "Fix RLS policy violation for organization creation",
+        "effort": "2-4h",
+        "files": ["src/contexts/AuthContext.tsx", "Supabase policies"]
+      },
+      {
+        "priority": "P0", 
+        "item": "Remove production console.logs",
+        "effort": "30min",
+        "files": ["src/contexts/AuthContext.tsx"]
+      }
+    ],
+    "performance_optimizations": [
+      {
+        "priority": "P1",
+        "item": "Add database indexes for common queries",
+        "effort": "1-2h",
+        "impact": "Significant query performance improvement"
+      },
+      {
+        "priority": "P1",
+        "item": "Implement proper error handling with .throwOnError()",
+        "effort": "2-3h", 
+        "files": ["src/lib/kpis.ts"]
+      }
+    ],
+    "feature_enhancements": [
+      {
+        "priority": "P2",
+        "item": "Implement Storage for file uploads",
+        "effort": "4-6h",
+        "files": ["src/components/modals/TransactionModal.tsx", "Supabase Storage"]
+      },
+      {
+        "priority": "P2",
+        "item": "Add real-time subscriptions for live updates", 
+        "effort": "6-8h",
+        "impact": "Better UX with live data"
+      }
+    ]
+  },
+  "security_score": {
+    "overall": "B+",
+    "strengths": [
+      "RLS enabled on all tables",
+      "Proper org_id filtering", 
+      "No service_role key exposure",
+      "Type-safe queries"
+    ],
+    "weaknesses": [
+      "RLS policy violation during signup",
+      "Production logging of auth events",
+      "No transaction safety for multi-table operations"
+    ]
+  },
+  "summary": {
+    "total_findings": 15,
+    "critical_issues": 2,
+    "optimization_opportunities": 6,
+    "missing_features": 7,
+    "estimated_fix_effort": "15-25 hours",
+    "next_review_date": "2025-02-01"
+  }
+}

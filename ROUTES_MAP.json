@@ -1,0 +1,257 @@
+{
+  "public_routes": {
+    "/": {
+      "component": "Homepage",
+      "description": "Landing page principal com hero, features e CTAs",
+      "file": "src/pages/Homepage.tsx",
+      "auth_required": false,
+      "key_actions": [
+        "Botão 'Crie sua conta' → /registrar",
+        "Botão 'Saiba Mais' → /produto", 
+        "Links do menu → várias páginas"
+      ]
+    },
+    "/produto": {
+      "component": "Produto", 
+      "description": "Página de produto com funcionalidades e demo",
+      "file": "src/pages/Produto.tsx",
+      "auth_required": false,
+      "key_actions": [
+        "Teste grátis por 7 dias",
+        "Ver planos"
+      ]
+    },
+    "/planos": {
+      "component": "Planos",
+      "description": "Página de preços e planos de assinatura", 
+      "file": "src/pages/Planos.tsx",
+      "auth_required": false,
+      "key_actions": [
+        "Escolher plano",
+        "Começar teste grátis"
+      ]
+    },
+    "/login": {
+      "component": "Login",
+      "description": "Página de autenticação/login",
+      "file": "src/pages/Login.tsx", 
+      "auth_required": false,
+      "redirect_after_auth": "/dashboard",
+      "key_actions": [
+        "Login com email/senha",
+        "Login com Google (mock)",
+        "Link para registro"
+      ]
+    },
+    "/registrar": {
+      "component": "Registrar",
+      "description": "Página de cadastro/registro",
+      "file": "src/pages/Registrar.tsx",
+      "auth_required": false,
+      "redirect_after_auth": "/dashboard", 
+      "key_actions": [
+        "Registro com email/senha/nome",
+        "Registro com Google (mock)",
+        "Link para login"
+      ]
+    },
+    "/central-ajuda": {
+      "component": "CentralAjuda",
+      "description": "FAQ e central de ajuda",
+      "file": "src/pages/CentralAjuda.tsx",
+      "auth_required": false,
+      "key_actions": [
+        "Busca em FAQ",
+        "Envio de mensagem de suporte"
+      ]
+    },
+    "/sobre-nos": {
+      "component": "SobreNos", 
+      "description": "Página sobre a empresa",
+      "file": "src/pages/SobreNos.tsx",
+      "auth_required": false
+    },
+    "/politica-privacidade": {
+      "component": "PoliticaPrivacidade",
+      "description": "Política de privacidade",
+      "file": "src/pages/PoliticaPrivacidade.tsx", 
+      "auth_required": false
+    },
+    "/termos-uso": {
+      "component": "TermosUso",
+      "description": "Termos de uso", 
+      "file": "src/pages/TermosUso.tsx",
+      "auth_required": false
+    }
+  },
+  "protected_routes": {
+    "/dashboard": {
+      "component": "Dashboard",
+      "description": "Dashboard principal com KPIs e métricas",
+      "file": "src/pages/Dashboard.tsx",
+      "auth_required": true,
+      "layout": "DashboardLayout",
+      "sidebar_item": "Início",
+      "key_features": [
+        "4 cards de KPI principais",
+        "Gráfico de fluxo de caixa (placeholder)",
+        "Vencimentos próximos", 
+        "Atividades recentes"
+      ]
+    },
+    "/dashboard/fluxo-caixa": {
+      "component": "FluxoCaixa",
+      "description": "Gestão de transações e fluxo de caixa",
+      "file": "src/pages/FluxoCaixa.tsx", 
+      "auth_required": true,
+      "layout": "DashboardLayout",
+      "sidebar_item": "Fluxo de Caixa",
+      "key_features": [
+        "Lista de transações",
+        "Filtros por período/tipo",
+        "Modal de nova transação",
+        "Histórico de movimentações"
+      ]
+    },
+    "/dashboard/contas": {
+      "component": "Contas",
+      "description": "Gestão de contas a pagar e receber",
+      "file": "src/pages/Contas.tsx",
+      "auth_required": true, 
+      "layout": "DashboardLayout",
+      "sidebar_item": "Contas",
+      "key_features": [
+        "Abas: Todas, A Pagar, A Receber",
+        "Histórico expansível",
+        "Modal de cadastro de conta",
+        "Ações: concluir/voltar"
+      ]
+    },
+    "/dashboard/clientes": {
+      "component": "Clientes",
+      "description": "CRM e gestão de clientes",
+      "file": "src/pages/Clientes.tsx",
+      "auth_required": true,
+      "layout": "DashboardLayout", 
+      "sidebar_item": "Clientes",
+      "key_features": [
+        "Lista de clientes",
+        "Modal de cadastro",
+        "Informações de contato",
+        "Links para WhatsApp"
+      ]
+    },
+    "/dashboard/fornecedores": {
+      "component": "Fornecedores", 
+      "description": "Gestão de fornecedores",
+      "file": "src/pages/Fornecedores.tsx",
+      "auth_required": true,
+      "layout": "DashboardLayout",
+      "sidebar_item": "Fornecedores",
+      "key_features": [
+        "Lista de fornecedores",
+        "Modal de cadastro", 
+        "Informações de contato",
+        "Gestão de relacionamento"
+      ]
+    },
+    "/dashboard/relatorios": {
+      "component": "Relatorios",
+      "description": "Relatórios financeiros e de negócio", 
+      "file": "src/pages/Relatorios.tsx",
+      "auth_required": true,
+      "layout": "DashboardLayout",
+      "sidebar_item": "Relatórios",
+      "key_features": [
+        "Relatórios financeiros",
+        "Gráficos e charts",
+        "Exportação (placeholder)",
+        "Filtros de período"
+      ]
+    },
+    "/dashboard/agenda": {
+      "component": "Agenda",
+      "description": "Calendário de eventos e compromissos",
+      "file": "src/pages/Agenda.tsx", 
+      "auth_required": true,
+      "layout": "DashboardLayout",
+      "sidebar_item": "Agenda",
+      "key_features": [
+        "Visualização em grid/lista",
+        "Modal de criação de eventos",
+        "Calendário mensal",
+        "Eventos com categorias"
+      ]
+    },
+    "/dashboard/integracoes": {
+      "component": "Integracoes",
+      "description": "Integrações com sistemas externos",
+      "file": "src/pages/Integracoes.tsx",
+      "auth_required": true,
+      "layout": "DashboardLayout", 
+      "sidebar_item": "Integrações",
+      "key_features": [
+        "Lista de integrações disponíveis",
+        "Status de conexão",
+        "Configurações",
+        "Logs de sincronização"
+      ]
+    }
+  },
+  "redirects": {
+    "/fluxo-caixa": "/dashboard/fluxo-caixa",
+    "/contas": "/dashboard/contas", 
+    "/clientes": "/dashboard/clientes",
+    "/fornecedores": "/dashboard/fornecedores",
+    "/relatorios": "/dashboard/relatorios",
+    "/agenda": "/dashboard/agenda"
+  },
+  "error_routes": {
+    "/*": {
+      "component": "NotFound",
+      "description": "Página 404 para rotas não encontradas",
+      "file": "src/pages/NotFound.tsx",
+      "logs_error": true
+    }
+  },
+  "route_guards": {
+    "ProtectedRoute": {
+      "file": "src/components/auth/ProtectedRoute.tsx",
+      "description": "HOC que protege rotas do dashboard", 
+      "redirect_when_unauthenticated": "/login",
+      "loading_state": true
+    }
+  },
+  "layouts": {
+    "DashboardLayout": {
+      "file": "src/components/layout/DashboardLayout.tsx",
+      "components": [
+        "AppSidebar",
+        "SidebarProvider", 
+        "SidebarTrigger"
+      ],
+      "background_color": "#f6f6fa",
+      "sidebar_color": "#ffffff"
+    }
+  },
+  "navigation": {
+    "AppSidebar": {
+      "file": "src/components/layout/AppSidebar.tsx",
+      "menu_items": [
+        {"title": "Início", "url": "/dashboard", "icon": "Home"},
+        {"title": "Fluxo de Caixa", "url": "/dashboard/fluxo-caixa", "icon": "TrendingUp"},
+        {"title": "Contas", "url": "/dashboard/contas", "icon": "Receipt"}, 
+        {"title": "Clientes", "url": "/dashboard/clientes", "icon": "Users"},
+        {"title": "Fornecedores", "url": "/dashboard/fornecedores", "icon": "Building"},
+        {"title": "Relatórios", "url": "/dashboard/relatorios", "icon": "BarChart3"},
+        {"title": "Agenda", "url": "/dashboard/agenda", "icon": "Calendar"},
+        {"title": "Integrações", "url": "/dashboard/integracoes", "icon": "Zap"}
+      ],
+      "user_menu": [
+        "Configurações",
+        "Assinatura", 
+        "Sair"
+      ]
+    }
+  }
+}

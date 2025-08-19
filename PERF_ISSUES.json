@@ -1,0 +1,335 @@
+{
+  "critical_performance_issues": [
+    {
+      "severity": "HIGH",
+      "category": "Database Queries",
+      "issue": "N+1 Problem in Dashboard",
+      "file": "src/pages/Dashboard.tsx", 
+      "lines": "43-92",
+      "description": "8 separate database queries executed on every dashboard load",
+      "queries": [
+        "getMonthlyRevenue(orgId)",
+        "getAccountsReceivable(orgId)", 
+        "getAccountsPayable(orgId)",
+        "getNewCustomersThisMonth(orgId)",
+        "getDeltaVsPrevMonth('revenue', orgId)",
+        "getDeltaVsPrevMonth('expenses', orgId)",
+        "getUpcomingBills(orgId, 7)",
+        "getRecentActivities(orgId, 10)"
+      ],
+      "current_implementation": "Promise.all() with 8 separate queries",
+      "performance_impact": "8 round trips to database, ~200-400ms load time",
+      "optimization": "Combine into 2-3 queries or create materialized view",
+      "estimated_improvement": "60-80% faster (80-120ms)",
+      "effort": "4-6 hours"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "React Rendering",
+      "issue": "Unnecessary re-renders due to useEffect dependencies",
+      "file": "src/pages/Dashboard.tsx",
+      "line": 93,
+      "description": "useEffect depends on 'toast' function causing unnecessary re-renders",
+      "current_code": "}, [orgId, toast]);",
+      "problem": "toast function reference changes on every render",
+      "optimization": "Remove toast from dependencies, it's stable",
+      "estimated_improvement": "Eliminate 2-3 unnecessary renders per page load",
+      "effort": "5 minutes"
+    }
+  ],
+  "database_performance": [
+    {
+      "severity": "MEDIUM",
+      "issue": "Missing Database Indexes",
+      "tables_affected": [
+        {
+          "table": "transactions",
+          "missing_index": "(org_id, kind, status, date)",
+          "query_pattern": "WHERE org_id = ? AND kind = ? AND status IN (...) AND date >= ?",
+          "frequency": "Every dashboard load + reports",
+          "files": ["src/lib/kpis.ts:11-18", "src/lib/kpis.ts:28-35"]
+        },
+        {
+          "table": "bills", 
+          "missing_index": "(org_id, board, status, due_date)",
+          "query_pattern": "WHERE org_id = ? AND board = ? AND status = ?",
+          "frequency": "Every dashboard load",
+          "files": ["src/lib/kpis.ts:59-64", "src/lib/kpis.ts:70-75"]
+        },
+        {
+          "table": "contacts",
+          "missing_index": "(org_id, type, created_at)",
+          "query_pattern": "WHERE org_id = ? AND type = ? AND created_at >= ?", 
+          "frequency": "Dashboard KPI calculation",
+          "files": ["src/lib/kpis.ts:112-117"]
+        }
+      ],
+      "impact": "Slow queries, especially with data growth",
+      "optimization": "Create composite indexes",
+      "effort": "1-2 hours"
+    },
+    {
+      "severity": "LOW",
+      "issue": "Redundant Delta Calculations",
+      "file": "src/lib/kpis.ts",
+      "description": "getDeltaVsPrevMonth called twice with different parameters",
+      "current_calls": [
+        "getDeltaVsPrevMonth('revenue', orgId)",
+        "getDeltaVsPrevMonth('expenses', orgId)"
+      ],
+      "optimization": "Single function returning both values",
+      "estimated_improvement": "50% reduction in delta calculation queries",
+      "effort": "30 minutes"
+    }
+  ],
+  "frontend_performance": [
+    {
+      "severity": "MEDIUM", 
+      "issue": "Large Bundle Size",
+      "description": "86 TypeScript files without code splitting",
+      "bundle_analysis": {
+        "pages": 18,
+        "components": 60+,
+        "estimated_bundle_size": "2-4MB uncompressed",
+        "main_contributors": [
+          "Radix UI components (40+ imports)",
+          "All pages loaded upfront", 
+          "Large icon library (lucide-react)"
+        ]
+      },
+      "optimization": "Implement route-based code splitting",
+      "suggested_splits": [
+        "Landing pages bundle",
+        "Dashboard bundle", 
+        "Auth bundle",
+        "Vendor libraries bundle"
+      ],
+      "estimated_improvement": "60-70% reduction in initial bundle",
+      "effort": "6-8 hours"
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "No Image Optimization",
+      "files": [
+        "src/assets/hero-woman-dashboard.jpg",
+        "src/assets/hero-woman-laptop.jpg", 
+        "src/assets/login-office.jpg",
+        "src/assets/product-dashboard.jpg"
+      ],
+      "problems": [
+        "No lazy loading implemented",
+        "No responsive image sizes",
+        "No modern format serving (WebP/AVIF)",
+        "Large file sizes not optimized"
+      ],
+      "optimization": "Implement lazy loading + responsive images",
+      "estimated_improvement": "40-60% faster initial page load",
+      "effort": "2-4 hours"
+    },
+    {
+      "severity": "LOW",
+      "issue": "Inline Function Definitions in Renders",
+      "examples": [
+        {
+          "file": "src/components/modals/TransactionModal.tsx",
+          "line": 98,
+          "code": "onClick={() => document.getElementById('file-upload')?.click()}"
+        },
+        {
+          "file": "src/pages/Agenda.tsx",
+          "line": 145,
+          "code": "onClick={() => setViewMode('grid')}"
+        }
+      ],
+      "impact": "Unnecessary re-renders of child components",
+      "optimization": "Extract to useCallback or component methods",
+      "effort": "1-2 hours"
+    }
+  ],
+  "memory_performance": [
+    {
+      "severity": "LOW",
+      "issue": "Missing React.memo for Static Components",
+      "components": [
+        "MetricCard",
+        "AppSidebar menu items",
+        "Form field components"
+      ],
+      "optimization": "Wrap with React.memo where appropriate",
+      "estimated_improvement": "Reduced memory usage in component tree",
+      "effort": "2-3 hours"
+    },
+    {
+      "severity": "LOW", 
+      "issue": "Console Logs in Production",
+      "files": [
+        "src/contexts/AuthContext.tsx (6 instances)",
+        "src/components/modals/TransactionModal.tsx",
+        "src/pages/Login.tsx",
+        "src/pages/Registrar.tsx"
+      ],
+      "impact": "Memory leaks in browser dev tools, performance degradation",
+      "optimization": "Remove or use conditional logging",
+      "effort": "30 minutes"
+    }
+  ],
+  "network_performance": [
+    {
+      "severity": "MEDIUM",
+      "issue": "No Request Deduplication",
+      "description": "Multiple components might trigger same queries",
+      "risk": "Dashboard + sidebar + modals making duplicate requests",
+      "optimization": "Implement React Query with proper caching",
+      "current_status": "React Query imported but not used consistently",
+      "effort": "4-6 hours"
+    },
+    {
+      "severity": "LOW",
+      "issue": "No Preloading of Critical Routes",
+      "description": "Dashboard route not preloaded after login",
+      "optimization": "Preload dashboard chunks after successful auth",
+      "estimated_improvement": "200-300ms faster dashboard navigation",
+      "effort": "1-2 hours"
+    }
+  ],
+  "user_experience_performance": [
+    {
+      "severity": "MEDIUM",
+      "issue": "No Loading Skeletons",
+      "affected_pages": [
+        "Dashboard (KPI cards)",
+        "FluxoCaixa (transaction list)", 
+        "Contas (bills list)",
+        "Clientes (client list)"
+      ],
+      "current_loading": "Simple text 'Carregando...' or spinner",
+      "optimization": "Implement skeleton components matching final layout",
+      "ux_improvement": "Perceived performance improvement",
+      "effort": "3-4 hours"
+    },
+    {
+      "severity": "LOW",
+      "issue": "No Error Boundaries",
+      "risk": "JavaScript errors crash entire app",
+      "optimization": "Implement error boundaries for route segments",
+      "effort": "2-3 hours"
+    }
+  ],
+  "optimization_recommendations": [
+    {
+      "priority": "P0 - Critical",
+      "items": [
+        {
+          "issue": "Dashboard N+1 queries",
+          "solution": "Combine queries or create database view",
+          "effort": "4-6 hours",
+          "impact": "60-80% faster dashboard loads"
+        },
+        {
+          "issue": "Missing database indexes",
+          "solution": "Create composite indexes for common query patterns", 
+          "effort": "1-2 hours",
+          "impact": "2-5x faster queries as data grows"
+        }
+      ]
+    },
+    {
+      "priority": "P1 - High",
+      "items": [
+        {
+          "issue": "Bundle size optimization",
+          "solution": "Implement code splitting by routes",
+          "effort": "6-8 hours", 
+          "impact": "60-70% smaller initial bundle"
+        },
+        {
+          "issue": "Image optimization",
+          "solution": "Lazy loading + responsive images",
+          "effort": "2-4 hours",
+          "impact": "40-60% faster page loads"
+        },
+        {
+          "issue": "React Query implementation",
+          "solution": "Consistent query caching and deduplication",
+          "effort": "4-6 hours",
+          "impact": "Reduced network requests, better UX"
+        }
+      ]
+    },
+    {
+      "priority": "P2 - Medium", 
+      "items": [
+        {
+          "issue": "Component optimization",
+          "solution": "React.memo, useCallback, proper dependencies",
+          "effort": "3-4 hours",
+          "impact": "Reduced re-renders and memory usage"
+        },
+        {
+          "issue": "Loading states",
+          "solution": "Skeleton components and error boundaries",
+          "effort": "5-6 hours", 
+          "impact": "Better perceived performance"
+        }
+      ]
+    }
+  ],
+  "performance_monitoring": {
+    "current_monitoring": "❌ None implemented",
+    "recommended_tools": [
+      "Web Vitals monitoring",
+      "React DevTools Profiler",
+      "Lighthouse CI", 
+      "Bundle analyzer"
+    ],
+    "key_metrics_to_track": [
+      "First Contentful Paint (FCP)",
+      "Largest Contentful Paint (LCP)",
+      "Cumulative Layout Shift (CLS)",
+      "Time to Interactive (TTI)",
+      "Bundle size over time",
+      "Query execution times"
+    ]
+  },
+  "estimated_improvements": {
+    "dashboard_load_time": {
+      "current": "800-1200ms",
+      "after_optimization": "200-400ms",
+      "improvement": "60-80% faster"
+    },
+    "initial_page_load": {
+      "current": "2-4 seconds",
+      "after_optimization": "800ms-1.5s", 
+      "improvement": "60-70% faster"
+    },
+    "bundle_size": {
+      "current": "2-4MB",
+      "after_optimization": "800kb-1.2MB initial",
+      "improvement": "60-70% smaller"
+    }
+  },
+  "implementation_roadmap": {
+    "week_1": [
+      "Fix Dashboard N+1 queries",
+      "Add database indexes", 
+      "Remove useEffect toast dependency"
+    ],
+    "week_2": [
+      "Implement code splitting",
+      "Add image lazy loading",
+      "Implement React Query consistently"
+    ],
+    "week_3": [
+      "Add React.memo optimizations",
+      "Implement loading skeletons",
+      "Add error boundaries"
+    ],
+    "week_4": [
+      "Performance monitoring setup",
+      "Bundle analysis and optimization",
+      "Final performance audit"
+    ]
+  },
+  "total_estimated_effort": "25-35 hours",
+  "expected_performance_gain": "60-80% overall improvement"
+}
