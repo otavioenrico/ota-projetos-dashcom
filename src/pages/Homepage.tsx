@@ -107,12 +107,13 @@ const Homepage = () => {
             </div>
 
             <div className="flex items-center gap-4">
-            <Button variant="outline" asChild>
-              <Link to="/login">Login</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/registrar">Cadastre-se</Link>
-            </Button>
+              <Button variant="outline" asChild>
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/registrar">Cadastre-se</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
