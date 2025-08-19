@@ -23,13 +23,11 @@ All colors MUST be HSL.
     /* Primary Brand Color - Azul #2F60DD (10% usage) */
     --primary: 222 77% 53%; /* #2F60DD */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 222 77% 53%;
-    --primary-active: 222 77% 53%;
 
     --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 0%;
 
-    --muted: 0 0% 96%;
+    --muted: 220 14% 96%; /* #f6f6fa */
     --muted-foreground: 0 0% 45%;
 
     --accent: 0 0% 96%;
@@ -44,22 +42,27 @@ All colors MUST be HSL.
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 0%;
 
-    --border: 0 0% 90%;
+    --border: 240 12% 91%; /* #e5e5ec */
     --input: 0 0% 90%;
     --ring: 222 77% 53%;
 
     --radius: 0.5rem;
+
+    /* Dashboard specific colors */
+    --dashboard-bg: 220 14% 96%; /* #f6f6fa */
+    --sidebar-active: 220 14% 96%; /* #f6f6fa */
+    --sidebar-active-text: 0 0% 20%; /* #333333 */
+    --sidebar-hover: 222 77% 53% / 0.05; /* rgba(47, 96, 221, 0.05) */
+    --card-border: 240 12% 91%; /* #e5e5ec */
+    --button-primary: 222 77% 53%; /* #2f60dd */
 
     --sidebar-background: 0 0% 100%; /* Pure white #ffffff */
     --sidebar-foreground: 0 0% 0%;
     --sidebar-primary: 0 0% 0%;
     --sidebar-primary-foreground: 0 0% 100%;
     
-    /* Sidebar accent uses brand blue with hover states */
     --sidebar-accent: 222 77% 53%; /* Brand blue for active state */
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-accent-hover: 222 77% 53% / 0.05; /* 5% opacity for hover */
-    --sidebar-accent-active: 222 77% 53% / 0.1; /* 10% opacity for active */
 
     --sidebar-border: 0 0% 90%;
     --sidebar-ring: 222 77% 53%;
@@ -110,26 +113,48 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+  }
+  
+  p, span, div {
+    font-weight: 400;
   }
 }
 
-/* DashComm Button States */
+/* Dashboard Design System */
 @layer components {
-  .btn-hover {
-    @apply hover:bg-primary/5 transition-colors duration-200;
+  .dashboard-card {
+    @apply bg-white border border-[hsl(var(--card-border))] rounded-lg;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
   
-  .btn-active {
-    @apply active:bg-primary/10 transition-colors duration-100;
+  .sidebar-item-active {
+    @apply bg-[hsl(var(--sidebar-active))] text-[hsl(var(--sidebar-active-text))];
+    font-weight: 600;
   }
   
-  .sidebar-nav-hover {
-    @apply hover:bg-primary/5 transition-colors duration-200;
+  .sidebar-item-hover {
+    @apply hover:bg-[hsl(var(--sidebar-hover))] transition-colors duration-200;
   }
   
-  .sidebar-nav-active {
-    @apply bg-primary text-primary-foreground font-medium;
+  .dashboard-content {
+    @apply bg-[hsl(var(--dashboard-bg))] min-h-screen;
+  }
+  
+  .dashboard-spacing {
+    @apply space-y-5;
+  }
+  
+  .dashboard-button {
+    @apply bg-[hsl(var(--button-primary))] text-white rounded-lg px-4 py-2.5 font-medium;
+    @apply hover:opacity-95 active:opacity-90 transition-opacity duration-200;
+    min-height: 40px;
+    min-width: fit-content;
+    padding: 10px 16px;
   }
 }

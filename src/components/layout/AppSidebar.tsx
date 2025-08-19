@@ -66,8 +66,12 @@ export function AppSidebar() {
   };
 
   const isActive = (path: string) => currentPath === path;
-  const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? "bg-primary/10 text-primary font-medium" : "hover:bg-accent/50";
+  const getNavCls = ({ isActive }: { isActive: boolean }) => {
+    if (isActive) {
+      return "sidebar-item-active";
+    }
+    return "text-foreground sidebar-item-hover";
+  };
 
   return (
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
@@ -93,10 +97,14 @@ export function AppSidebar() {
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} end className={getNavCls}>
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
+                     <NavLink 
+                       to={item.url} 
+                       end 
+                       className={getNavCls}
+                     >
+                       <item.icon className="h-4 w-4 flex-shrink-0" />
+                       {!collapsed && <span className="ml-3 truncate">{item.title}</span>}
+                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

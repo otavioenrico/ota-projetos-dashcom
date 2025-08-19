@@ -106,114 +106,114 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Início</h1>
-        <p className="text-muted-foreground">
+    <div className="dashboard-spacing">
+      <div className="dashboard-card p-6">
+        <h1 className="text-3xl font-semibold">Início</h1>
+        <p className="text-muted-foreground mt-2">
           Visão geral do seu e-commerce em tempo real
         </p>
       </div>
 
       {/* Métricas principais */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Faturamento do Mês</CardTitle>
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        <div className="dashboard-card">
+          <div className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
+            <h3 className="text-sm font-medium">Faturamento do Mês</h3>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 0,00</div>
+          </div>
+          <div className="p-6 pt-0">
+            <div className="text-2xl font-semibold">R$ 0,00</div>
             <p className="text-xs text-muted-foreground">
               0,00% em relação ao mês anterior
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Contas a Receber</CardTitle>
+        <div className="dashboard-card">
+          <div className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
+            <h3 className="text-sm font-medium">Contas a Receber</h3>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 0,00</div>
+          </div>
+          <div className="p-6 pt-0">
+            <div className="text-2xl font-semibold">R$ 0,00</div>
             <p className="text-xs text-muted-foreground">
               0,00% em relação ao mês anterior
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Contas a Pagar</CardTitle>
+        <div className="dashboard-card">
+          <div className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
+            <h3 className="text-sm font-medium">Contas a Pagar</h3>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 0,00</div>
+          </div>
+          <div className="p-6 pt-0">
+            <div className="text-2xl font-semibold">R$ 0,00</div>
             <p className="text-xs text-muted-foreground">
               0,00% em relação ao mês anterior
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Novos Clientes</CardTitle>
+        <div className="dashboard-card">
+          <div className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
+            <h3 className="text-sm font-medium">Novos Clientes</h3>
             <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">0</div>
+          </div>
+          <div className="p-6 pt-0">
+            <div className="text-2xl font-semibold">0</div>
             <p className="text-xs text-muted-foreground">
               0,00% em relação ao mês anterior
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Charts Section */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+      <div className="grid gap-5 md:grid-cols-2">
+        <div className="dashboard-card">
+          <div className="p-6 pb-4">
+            <h3 className="font-semibold flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
               Fluxo de Caixa (últimos 7 dias)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </h3>
+          </div>
+          <div className="p-6 pt-0">
             <div className="h-[200px] flex items-center justify-center text-muted-foreground">
               Gráfico do fluxo de caixa será implementado aqui
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <div className="dashboard-card">
+          <div className="p-6 pb-4">
+            <h3 className="font-semibold flex items-center gap-2">
               <Calendar className="w-5 h-5" />
               Vencimentos em 7 dias
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </h3>
+          </div>
+          <div className="p-6 pt-0">
             <div className="text-center py-8 text-muted-foreground">
               Nenhum vencimento nos próximos 7 dias
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Recent Activities */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <div className="dashboard-card">
+        <div className="p-6 pb-4">
+          <h3 className="font-semibold flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
             Atividades Recentes
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </h3>
+        </div>
+        <div className="p-6 pt-0">
           <div className="text-center py-8 text-muted-foreground">
             Nenhuma atividade recente
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
