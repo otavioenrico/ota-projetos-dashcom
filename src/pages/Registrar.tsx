@@ -5,31 +5,49 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   TrendingUp, 
   Mail,
   Eye,
   EyeOff,
   CheckCircle2,
-  ArrowLeft
+  ArrowLeft,
+  Loader2
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Registrar = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     acceptTerms: false
   });
+  
+  const { signUp, isLoading } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aqui seria implementada a lógica de registro
-    console.log("Registrando usuário:", formData);
-    setIsRegistered(true);
+    setError("");
+    
+    if (!formData.acceptTerms) {
+      setError("Você deve aceitar os termos de uso e política de privacidade.");
+      return;
+    }
+
+    try {
+      const success = await signUp(formData.email, formData.password, formData.name);
+      if (success) {
+        setIsRegistered(true);
+      }
+    } catch (err) {
+      setError("Erro ao criar conta. Tente novamente.");
+    }
   };
 
   const handleGoogleSignUp = () => {
@@ -124,6 +142,12 @@ const Registrar = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome completo</Label>
@@ -200,8 +224,15 @@ const Registrar = () => {
                   </label>
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Criar conta gratuita
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Criando conta...
+                    </>
+                  ) : (
+                    "Criar conta gratuita"
+                  )}
                 </Button>
               </form>
 

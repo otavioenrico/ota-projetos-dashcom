@@ -40,7 +40,7 @@ const Login = () => {
       if (success) {
         navigate(from, { replace: true });
       } else {
-        setError("Credenciais inválidas. Use: admin / 12345");
+        setError("Email ou senha incorretos. Verifique suas credenciais.");
       }
     } catch (err) {
       setError("Erro ao fazer login. Tente novamente.");
@@ -137,14 +137,6 @@ const Login = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    <strong>Credenciais de teste:</strong><br />
-                    Login: admin<br />
-                    Senha: 12345
-                  </AlertDescription>
-                </Alert>
 
                 {error && (
                   <Alert variant="destructive">
@@ -155,11 +147,11 @@ const Login = () => {
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Usuário ou Email</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
-                      type="text"
-                      placeholder="Digite seu usuário ou email"
+                      type="email"
+                      placeholder="Digite seu email"
                       value={formData.email}
                       onChange={(e) => setFormData(prev => ({...prev, email: e.target.value}))}
                       required

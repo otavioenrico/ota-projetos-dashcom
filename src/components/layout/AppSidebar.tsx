@@ -116,7 +116,7 @@ export function AppSidebar() {
             </Avatar>
             {!collapsed && (
               <div className="flex-1 text-left">
-                <p className="text-sm font-medium text-sidebar-foreground">{user?.name || "Usuário"}</p>
+                <p className="text-sm font-medium text-sidebar-foreground">{user?.user_metadata?.full_name || "Usuário"}</p>
                 <p className="text-xs text-sidebar-foreground/60">{user?.email || "usuario@exemplo.com"}</p>
               </div>
             )}
