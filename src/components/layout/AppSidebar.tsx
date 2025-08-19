@@ -67,7 +67,7 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? "sidebar-nav-active" : "sidebar-nav-hover";
+    isActive ? "bg-primary/10 text-primary" : "hover:bg-accent/50";
 
   return (
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
@@ -89,7 +89,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-2">
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>

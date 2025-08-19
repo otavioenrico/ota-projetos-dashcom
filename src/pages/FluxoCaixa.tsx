@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TransactionModal } from "@/components/modals/TransactionModal";
 import { 
   Plus, 
   ArrowUpCircle, 
@@ -54,6 +56,8 @@ const transacoes = [
 ];
 
 const FluxoCaixa = () => {
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -63,7 +67,7 @@ const FluxoCaixa = () => {
             Controle completo de todas suas movimentações financeiras
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setShowTransactionModal(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Nova Transação
         </Button>
@@ -173,6 +177,11 @@ const FluxoCaixa = () => {
           </div>
         </CardContent>
       </Card>
+
+      <TransactionModal 
+        open={showTransactionModal} 
+        onOpenChange={setShowTransactionModal} 
+      />
     </div>
   );
 };

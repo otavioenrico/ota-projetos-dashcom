@@ -86,12 +86,12 @@ const Homepage = () => {
       {/* Navigation */}
       <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl">DashComm</span>
-          </div>
+          </Link>
           
           <div className="flex items-center gap-8">
             <div className="hidden md:flex items-center gap-8">
@@ -120,7 +120,7 @@ const Homepage = () => {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[800px]">
           <div className="space-y-6">
             <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
               Pare de perder tempo com planilhas.
@@ -136,7 +136,7 @@ const Homepage = () => {
           <div className="relative">
             <div className="relative rounded-2xl overflow-hidden">
               <img 
-                src="/src/assets/hero-woman-dashboard.jpg" 
+                src="/lovable-uploads/64dc1ce8-a8f2-47ea-859f-75ec16de3715.png" 
                 alt="Profissional trabalhando com dashboard de vendas e notificações de faturamento" 
                 className="w-full h-auto"
               />
@@ -162,6 +162,47 @@ const Homepage = () => {
                   <p className="text-xs text-muted-foreground">Faturamento</p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Integrations Section */}
+      <section className="bg-muted/50 py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl lg:text-3xl font-bold mb-4">
+              Integrações com as principais plataformas
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Conecte-se automaticamente com os marketplaces líderes do mercado
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+            <div className="text-center">
+              <div className="text-4xl mb-2">🛒</div>
+              <p className="text-sm font-medium">Mercado Livre</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-2">🛍️</div>
+              <p className="text-sm font-medium">Shopee</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-2">👗</div>
+              <p className="text-sm font-medium">Shein</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-2">📦</div>
+              <p className="text-sm font-medium">Amazon</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-2">📊</div>
+              <p className="text-sm font-medium">Tiny</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-2">💼</div>
+              <p className="text-sm font-medium">Bling</p>
             </div>
           </div>
         </div>

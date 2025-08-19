@@ -92,13 +92,13 @@ export default function Dashboard() {
     loadDashboardData();
   }, [orgId, toast]);
 
-  if (!orgId) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <h2 className="text-lg font-semibold mb-2">Configuração Necessária</h2>
+          <h2 className="text-lg font-semibold mb-2">Carregando Dashboard</h2>
           <p className="text-muted-foreground">
-            Aguarde enquanto configuramos sua organização...
+            Aguarde enquanto carregamos os dados...
           </p>
         </div>
       </div>

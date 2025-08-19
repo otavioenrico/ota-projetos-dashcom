@@ -218,7 +218,7 @@ const Produto = () => {
       </section>
 
       {/* Metrics Section */}
-      <section className="py-20">
+      <section className="py-20" style={{ backgroundColor: '#f6f6fa' }}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">

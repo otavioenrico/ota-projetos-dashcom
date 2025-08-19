@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { 
   TrendingUp, 
   Check,
@@ -9,69 +10,32 @@ import {
   Zap
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const Planos = () => {
-  const plans = [
-    {
-      name: "Trial Gratuito",
-      price: "R$ 0",
-      period: "/7 dias",
-      description: "Teste todas as funcionalidades",
-      popular: false,
-      features: [
-        { name: "Acesso completo por 7 dias", included: true },
-        { name: "Todas as integrações", included: true },
-        { name: "Relatórios avançados", included: true },
-        { name: "Suporte prioritário", included: true },
-        { name: "Todas as funcionalidades", included: true },
-        { name: "Sem limitações", included: true },
-        { name: "Após 7 dias, assinatura necessária", included: false },
-        { name: "Backup automático", included: true }
-      ],
-      buttonText: "Iniciar trial",
-      buttonVariant: "outline" as const
-    },
-    {
-      name: "Mensal",
-      price: "R$ 39",
-      period: "/mês",
-      description: "Para negócios em crescimento",
-      popular: true,
-      features: [
-        { name: "Transações ilimitadas", included: true },
-        { name: "Todas as integrações", included: true },
-        { name: "Relatórios avançados", included: true },
-        { name: "Suporte prioritário", included: true },
-        { name: "Gestão de clientes", included: true },
-        { name: "Fluxo de caixa completo", included: true },
-        { name: "Agenda financeira", included: true },
-        { name: "Backup automático", included: true }
-      ],
-      buttonText: "Assinar agora",
-      buttonVariant: "default" as const
-    },
-    {
-      name: "Anual",
-      price: "R$ 400",
-      period: "/ano",
-      originalPrice: "R$ 468",
-      discount: "15% de desconto",
-      description: "Melhor custo-benefício",
-      popular: false,
-      features: [
-        { name: "Tudo do plano mensal", included: true },
-        { name: "2 meses grátis", included: true },
-        { name: "Suporte telefônico", included: true },
-        { name: "Consultoria mensal gratuita", included: true },
-        { name: "Relatórios personalizados", included: true },
-        { name: "API para integrações customizadas", included: true },
-        { name: "Backup diário", included: true },
-        { name: "Prioridade em novos recursos", included: true }
-      ],
-      buttonText: "Assinar anual",
-      buttonVariant: "default" as const
-    }
-  ];
+  const [isAnnual, setIsAnnual] = useState(false);
+
+  const plan = {
+    name: "DashComm Pro",
+    monthlyPrice: "R$ 39",
+    annualPrice: "R$ 400",
+    originalAnnualPrice: "R$ 468",
+    description: "Para negócios em crescimento",
+    features: [
+      { name: "Transações ilimitadas", included: true },
+      { name: "Todas as integrações", included: true },
+      { name: "Relatórios avançados", included: true },
+      { name: "Suporte prioritário", included: true },
+      { name: "Gestão de clientes", included: true },
+      { name: "Fluxo de caixa completo", included: true },
+      { name: "Agenda financeira", included: true },
+      { name: "Backup automático", included: true },
+      { name: "API para integrações customizadas", included: isAnnual },
+      { name: "Consultoria mensal gratuita", included: isAnnual },
+      { name: "Relatórios personalizados", included: isAnnual },
+      { name: "Prioridade em novos recursos", included: isAnnual }
+    ]
+  };
 
   const faq = [
     {
@@ -145,49 +109,78 @@ const Planos = () => {
         </div>
       </section>
 
-      {/* Pricing Cards */}
-      <section className="container mx-auto px-4 pb-20">
-        <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan, index) => (
-            <Card 
-              key={index} 
-              className={`relative ${plan.popular ? 'ring-2 ring-primary shadow-lg scale-105' : ''}`}
-            >
-              {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary">
-                  <Star className="w-3 h-3 mr-1" />
-                  Mais Popular
-                </Badge>
-              )}
-              
-              <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                <div className="space-y-2">
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    <span className="text-muted-foreground">{plan.period}</span>
-                  </div>
-                  {plan.originalPrice && (
-                    <div className="space-y-1">
-                      <p className="text-sm text-muted-foreground line-through">
-                        {plan.originalPrice}
-                      </p>
-                      <Badge variant="secondary" className="text-success">
-                        <Zap className="w-3 h-3 mr-1" />
-                        {plan.discount}
-                      </Badge>
+      {/* Pricing Toggle */}
+      <section className="container mx-auto px-4 pb-8">
+        <div className="max-w-md mx-auto">
+          <div className="flex items-center justify-center gap-4 p-4 bg-muted/50 rounded-lg">
+            <span className={`font-medium ${!isAnnual ? 'text-primary' : 'text-muted-foreground'}`}>
+              Mensal
+            </span>
+            <Switch
+              checked={isAnnual}
+              onCheckedChange={setIsAnnual}
+            />
+            <span className={`font-medium ${isAnnual ? 'text-primary' : 'text-muted-foreground'}`}>
+              Anual
+            </span>
+            {isAnnual && (
+              <Badge variant="secondary" className="text-success">
+                15% off
+              </Badge>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Card */}
+      <section className="container mx-auto px-4 pb-12">
+        <div className="max-w-4xl mx-auto">
+          <Card className="relative ring-2 ring-primary shadow-lg">
+            <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary">
+              <Star className="w-3 h-3 mr-1" />
+              Mais Popular
+            </Badge>
+            
+            <div className="grid md:grid-cols-2 gap-0">
+              {/* Left side - Pricing */}
+              <div className="p-8 border-r">
+                <div className="text-center space-y-4">
+                  <h3 className="text-2xl font-bold">{plan.name}</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-4xl font-bold">
+                        {isAnnual ? plan.annualPrice : plan.monthlyPrice}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {isAnnual ? '/ano' : '/mês'}
+                      </span>
                     </div>
-                  )}
+                    {isAnnual && (
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground line-through">
+                          {plan.originalAnnualPrice}
+                        </p>
+                        <Badge variant="secondary" className="text-success">
+                          <Zap className="w-3 h-3 mr-1" />
+                          15% de desconto
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground">{plan.description}</p>
+                  <Button className="w-full text-lg py-6" asChild>
+                    <Link to="/registrar">
+                      {isAnnual ? 'Assinar anual' : 'Assinar agora'}
+                    </Link>
+                  </Button>
                 </div>
-                <CardDescription className="text-base">
-                  {plan.description}
-                </CardDescription>
-              </CardHeader>
+              </div>
               
-              <CardContent className="space-y-6">
+              {/* Right side - Features */}
+              <div className="p-8">
                 <ul className="space-y-3">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center gap-3">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-center gap-3">
                       {feature.included ? (
                         <Check className="w-5 h-5 text-success flex-shrink-0" />
                       ) : (
@@ -199,22 +192,34 @@ const Planos = () => {
                     </li>
                   ))}
                 </ul>
-                
-                <Button 
-                  className="w-full text-lg py-6" 
-                  variant={plan.buttonVariant}
-                  asChild
-                >
-                  <Link to="/registrar">{plan.buttonText}</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* Free Trial Card */}
+      <section className="container mx-auto px-4 pb-20">
+        <div className="max-w-md mx-auto">
+          <Card className="text-center">
+            <CardContent className="p-6">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Teste grátis por 7 dias</h3>
+              <p className="text-muted-foreground mb-4">
+                Experimente todas as funcionalidades sem compromisso
+              </p>
+              <Button variant="outline" className="w-full" asChild>
+                <Link to="/registrar">Começar teste gratuito</Link>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20">
+      <section className="py-20" style={{ backgroundColor: '#f6f6fa' }}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
@@ -275,7 +280,7 @@ const Planos = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20">
+      <section className="py-20" style={{ backgroundColor: '#f6f6fa' }}>
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4">
             Pronto para começar?
