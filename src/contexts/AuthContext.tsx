@@ -32,9 +32,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Clear orgId when user signs out
+        // Handle auth state changes
         if (event === 'SIGNED_OUT') {
           setOrgId(null);
+          // If user is on a protected route, redirect to homepage
+          const currentPath = window.location.pathname;
+          if (currentPath.startsWith('/app') || currentPath.startsWith('/dashboard')) {
+            window.location.href = '/';
+          }
+        } else if (event === 'SIGNED_IN') {
+          // Redirect to auth complete for organization setup
+          const currentPath = window.location.pathname;
+          const publicRoutes = ['/', '/login', '/registrar', '/produto', '/planos'];
+          if (publicRoutes.includes(currentPath)) {
+            window.location.href = '/auth/complete';
+          }
         }
         
         setIsLoading(false);

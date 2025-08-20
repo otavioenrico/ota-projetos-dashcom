@@ -38,11 +38,12 @@ function AppContent() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Only redirect authenticated users from public routes
     if (session && user) {
       const currentPath = window.location.pathname;
-      const isPublicRoute = ['/', '/login', '/registrar', '/produto', '/planos', '/central-ajuda', '/sobre-nos', '/politica-privacidade', '/termos-uso'].includes(currentPath);
+      const publicRoutes = ['/', '/login', '/registrar', '/produto', '/planos'];
       
-      if (isPublicRoute) {
+      if (publicRoutes.includes(currentPath)) {
         navigate('/auth/complete', { replace: true });
       }
     }
