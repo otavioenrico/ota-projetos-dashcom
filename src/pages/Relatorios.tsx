@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, TrendingUp, TrendingDown, DollarSign, BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,50 +22,119 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-const dadosReceitas = [
-  { mes: "Jan", receitas: 45000, despesas: 32000, lucro: 13000 },
-  { mes: "Fev", receitas: 52000, despesas: 35000, lucro: 17000 },
-  { mes: "Mar", receitas: 48000, despesas: 31000, lucro: 17000 },
-  { mes: "Abr", receitas: 61000, despesas: 42000, lucro: 19000 },
-  { mes: "Mai", receitas: 55000, despesas: 38000, lucro: 17000 },
-  { mes: "Jun", receitas: 67000, despesas: 45000, lucro: 22000 },
-];
-
-const dadosComparativos = [
-  { categoria: "Vendas Online", atual: 45000, anterior: 38000 },
-  { categoria: "Vendas Físicas", atual: 32000, anterior: 35000 },
-  { categoria: "Serviços", atual: 18000, anterior: 15000 },
-  { categoria: "Produtos", atual: 52000, anterior: 48000 },
-];
+interface CashflowData {
+  d: string;
+  inflow: number;
+  outflow: number;
+}
 
 export default function Relatorios() {
-  const [periodo, setPeriodo] = useState("mes");
+  const [periodo, setPeriodo] = useState("30");
+  const [cashflowData, setCashflowData] = useState<CashflowData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { orgId } = useAuth();
+  const { toast } = useToast();
+
+  const loadCashflowData = async () => {
+    if (!orgId) {
+      toast({
+        title: "Erro",
+        description: "Selecione/Crie sua organização",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      // Call the RPC function using raw query since types aren't available
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('date, amount_net, kind')
+        .eq('org_id', orgId)
+        .gte('date', new Date(Date.now() - parseInt(periodo) * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+        .order('date', { ascending: true });
+
+      if (error) throw error;
+      
+      // Process data into cashflow format
+      const processedData = (data || []).reduce((acc: any[], transaction: any) => {
+        const date = transaction.date;
+        const existing = acc.find(item => item.d === date);
+        
+        if (existing) {
+          if (transaction.kind === 'inflow') {
+            existing.inflow += transaction.amount_net || 0;
+          } else {
+            existing.outflow += transaction.amount_net || 0;
+          }
+        } else {
+          acc.push({
+            d: date,
+            inflow: transaction.kind === 'inflow' ? (transaction.amount_net || 0) : 0,
+            outflow: transaction.kind === 'outflow' ? (transaction.amount_net || 0) : 0
+          });
+        }
+        return acc;
+      }, []);
+      
+      setCashflowData(processedData);
+    } catch (error) {
+      console.error('Error loading cashflow data:', error);
+      toast({
+        title: "Erro ao carregar dados",
+        description: "Tente novamente",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (orgId) {
+      loadCashflowData();
+    }
+  }, [orgId, periodo]);
 
   const getPeriodoLabel = (periodo: string) => {
     const labels = {
-      semana: "Última Semana",
-      quinze: "Últimos 15 dias",
-      mes: "Último Mês",
-      trimestre: "Últimos 3 meses",
-      semestre: "Últimos 6 meses",
-      ano: "Último Ano"
+      "7": "Últimos 7 dias",
+      "15": "Últimos 15 dias", 
+      "30": "Últimos 30 dias",
+      "90": "Últimos 3 meses",
+      "180": "Últimos 6 meses",
+      "365": "Último ano"
     };
     return labels[periodo as keyof typeof labels] || "Período";
   };
 
-  const calcularVariacao = (atual: number, anterior: number) => {
-    const variacao = ((atual - anterior) / anterior) * 100;
-    return {
-      valor: Math.abs(variacao).toFixed(1),
-      positiva: variacao > 0
-    };
-  };
-
-  const totalReceitas = dadosReceitas.reduce((acc, item) => acc + item.receitas, 0);
-  const totalDespesas = dadosReceitas.reduce((acc, item) => acc + item.despesas, 0);
+  const totalReceitas = cashflowData.reduce((acc, item) => acc + item.inflow, 0);
+  const totalDespesas = cashflowData.reduce((acc, item) => acc + item.outflow, 0);
   const lucroTotal = totalReceitas - totalDespesas;
-  const margemLucro = ((lucroTotal / totalReceitas) * 100).toFixed(1);
+  const margemLucro = totalReceitas > 0 ? ((lucroTotal / totalReceitas) * 100).toFixed(1) : "0.0";
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Relatórios</h1>
+            <p className="text-muted-foreground">Carregando...</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="h-24 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -80,12 +149,12 @@ export default function Relatorios() {
             <SelectValue placeholder="Selecionar período" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semana">Última Semana</SelectItem>
-            <SelectItem value="quinze">Últimos 15 dias</SelectItem>
-            <SelectItem value="mes">Último Mês</SelectItem>
-            <SelectItem value="trimestre">Últimos 3 meses</SelectItem>
-            <SelectItem value="semestre">Últimos 6 meses</SelectItem>
-            <SelectItem value="ano">Último Ano</SelectItem>
+            <SelectItem value="7">Últimos 7 dias</SelectItem>
+            <SelectItem value="15">Últimos 15 dias</SelectItem>
+            <SelectItem value="30">Últimos 30 dias</SelectItem>
+            <SelectItem value="90">Últimos 3 meses</SelectItem>
+            <SelectItem value="180">Últimos 6 meses</SelectItem>
+            <SelectItem value="365">Último ano</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -94,196 +163,104 @@ export default function Relatorios() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Faturamento</CardTitle>
+            <CardTitle className="text-sm font-medium">Entradas</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ {totalReceitas.toLocaleString()}</div>
+            <div className="text-2xl font-bold">R$ {totalReceitas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
             <div className="flex items-center text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-              +12.5% vs período anterior
+              Período selecionado
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Despesas</CardTitle>
+            <CardTitle className="text-sm font-medium">Saídas</CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ {totalDespesas.toLocaleString()}</div>
+            <div className="text-2xl font-bold">R$ {totalDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
             <div className="flex items-center text-xs text-muted-foreground">
               <TrendingDown className="h-3 w-3 mr-1 text-red-500" />
-              +8.2% vs período anterior
+              Período selecionado
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Lucro Líquido</CardTitle>
+            <CardTitle className="text-sm font-medium">Saldo Líquido</CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ {lucroTotal.toLocaleString()}</div>
+            <div className="text-2xl font-bold">R$ {lucroTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
             <div className="flex items-center text-xs text-muted-foreground">
-              <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-              +18.1% vs período anterior
+              {lucroTotal >= 0 ? (
+                <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
+              ) : (
+                <TrendingDown className="h-3 w-3 mr-1 text-red-500" />
+              )}
+              Período selecionado
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Margem de Lucro</CardTitle>
+            <CardTitle className="text-sm font-medium">Margem</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{margemLucro}%</div>
             <div className="flex items-center text-xs text-muted-foreground">
-              <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-              +2.3% vs período anterior
+              {parseFloat(margemLucro) >= 0 ? (
+                <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
+              ) : (
+                <TrendingDown className="h-3 w-3 mr-1 text-red-500" />
+              )}
+              Período selecionado
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Gráfico de Receitas vs Despesas */}
+      {/* Gráfico de Fluxo de Caixa */}
       <Card>
         <CardHeader>
-          <CardTitle>Receitas vs Despesas - {getPeriodoLabel(periodo)}</CardTitle>
+          <CardTitle>Fluxo de Caixa - {getPeriodoLabel(periodo)}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={dadosReceitas}>
+            <AreaChart data={cashflowData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="mes" />
+              <XAxis dataKey="d" />
               <YAxis />
               <Tooltip 
                 formatter={(value: number) => [
-                  `R$ ${value.toLocaleString()}`,
+                  `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
                   ''
                 ]}
               />
               <Area
                 type="monotone"
-                dataKey="receitas"
+                dataKey="inflow"
                 stackId="1"
                 stroke="hsl(var(--primary))"
                 fill="hsl(var(--primary))"
-                name="Receitas"
+                name="Entradas"
               />
               <Area
                 type="monotone"
-                dataKey="despesas"
+                dataKey="outflow"
                 stackId="2"
                 stroke="hsl(var(--destructive))"
                 fill="hsl(var(--destructive))"
-                name="Despesas"
+                name="Saídas"
               />
             </AreaChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Gráfico de Lucro */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Evolução do Lucro</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={dadosReceitas}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="mes" />
-                <YAxis />
-                <Tooltip 
-                  formatter={(value: number) => [
-                    `R$ ${value.toLocaleString()}`,
-                    'Lucro'
-                  ]}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="lucro"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={3}
-                  dot={{ fill: "hsl(var(--primary))" }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Comparativo por Categoria */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Comparativo por Categoria</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={dadosComparativos}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="categoria" />
-                <YAxis />
-                <Tooltip 
-                  formatter={(value: number) => [
-                    `R$ ${value.toLocaleString()}`,
-                    ''
-                  ]}
-                />
-                <Bar
-                  dataKey="anterior"
-                  fill="hsl(var(--muted))"
-                  name="Período Anterior"
-                />
-                <Bar
-                  dataKey="atual"
-                  fill="hsl(var(--primary))"
-                  name="Período Atual"
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tabela de Performance por Categoria */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Performance Detalhada por Categoria</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {dadosComparativos.map((item) => {
-              const variacao = calcularVariacao(item.atual, item.anterior);
-              return (
-                <div key={item.categoria} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h4 className="font-medium">{item.categoria}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Período anterior: R$ {item.anterior.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold">R$ {item.atual.toLocaleString()}</div>
-                    <div className={`flex items-center text-sm ${
-                      variacao.positiva ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {variacao.positiva ? (
-                        <TrendingUp className="h-3 w-3 mr-1" />
-                      ) : (
-                        <TrendingDown className="h-3 w-3 mr-1" />
-                      )}
-                      {variacao.positiva ? '+' : '-'}{variacao.valor}%
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </CardContent>
       </Card>
     </div>

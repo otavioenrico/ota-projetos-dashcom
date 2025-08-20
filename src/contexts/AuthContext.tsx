@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase, getActiveOrgId, hasOrganization, createUserOrganization } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
@@ -31,6 +31,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // Clear orgId when user signs out
+        if (event === 'SIGNED_OUT') {
+          setOrgId(null);
+        }
+        
         setIsLoading(false);
       }
     );

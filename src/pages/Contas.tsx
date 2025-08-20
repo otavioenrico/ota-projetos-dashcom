@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Plus, 
   Upload,
@@ -26,15 +28,21 @@ import {
 } from "lucide-react";
 
 interface Conta {
-  id: number;
-  descricao: string;
-  fornecedor: string;
-  valor: number;
-  dataVencimento: string;
-  status: "pendente" | "pago" | "vencido" | "concluido";
-  categoria: string;
-  parcela?: string;
-  observacoes?: string;
+  id: string;
+  description: string;
+  contact_id?: string;
+  total_amount: number;
+  due_date: string;
+  status: string;
+  category_id?: string;
+  installments?: number;
+  notes?: string;
+  board: string;
+  org_id: string;
+  created_at?: string;
+  updated_at?: string;
+  external_ref?: string;
+  file_url?: string;
 }
 
 const Contas = () => {
@@ -42,158 +50,210 @@ const Contas = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [historicoAberto, setHistoricoAberto] = useState(false);
-  const [contas, setContas] = useState<Conta[]>([
-    {
-      id: 1,
-      descricao: "Fornecedor ABC - Estoque",
-      fornecedor: "Fornecedor ABC Ltda",
-      valor: 2500.00,
-      dataVencimento: "2024-01-20",
-      status: "pendente",
-      categoria: "Fornecedores",
-      parcela: "1/4",
-      observacoes: "Pagamento parcelado em 4x"
-    },
-    {
-      id: 2,
-      descricao: "Aluguel da Loja",
-      fornecedor: "Imobiliária Silva",
-      valor: 3200.00,
-      dataVencimento: "2024-01-15",
-      status: "pago",
-      categoria: "Fixas",
-    },
-    {
-      id: 3,
-      descricao: "Conta de Energia",
-      fornecedor: "Companhia Elétrica",
-      valor: 480.50,
-      dataVencimento: "2024-01-12",
-      status: "vencido",
-      categoria: "Utilitários",
-    },
-    {
-      id: 4,
-      descricao: "Venda Cliente XYZ",
-      fornecedor: "Cliente XYZ Ltda",
-      valor: 4500.00,
-      dataVencimento: "2024-01-25",
-      status: "pendente",
-      categoria: "Vendas",
-      parcela: "2/3"
-    },
-    {
-      id: 5,
-      descricao: "Serviço de Consultoria",
-      fornecedor: "Empresa DEF",
-      valor: 1800.00,
-      dataVencimento: "2024-01-18",
-      status: "pendente",
-      categoria: "Serviços",
-    }
-  ]);
+  const [contas, setContas] = useState<Conta[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const { toast } = useToast();
+  const { orgId } = useAuth();
   
   const form = useForm({
     defaultValues: {
-      descricao: "",
-      fornecedor: "",
-      valor: "",
-      dataVencimento: "",
-      categoria: "",
-      parcelas: "1",
-      observacoes: ""
+      description: "",
+      contact_id: "",
+      total_amount: "",
+      due_date: "",
+      board: "pagar",
+      installments: "1",
+      notes: ""
     }
   });
+
+  const loadContas = async () => {
+    if (!orgId) {
+      toast({
+        title: "Erro",
+        description: "Selecione/Crie sua organização",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('bills')
+        .select('*')
+        .eq('org_id', orgId)
+        .order('due_date', { ascending: true });
+
+      if (error) throw error;
+      setContas(data || []);
+    } catch (error) {
+      console.error('Error loading bills:', error);
+      toast({
+        title: "Erro ao carregar contas",
+        description: "Tente novamente",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (orgId) {
+      loadContas();
+    }
+  }, [orgId]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      // Simular processamento do boleto
+      // OCR stub - apenas preenche campos no form, não grava nada
       setIsProcessing(true);
       setTimeout(() => {
         setIsProcessing(false);
-        form.setValue("descricao", "Fornecedor XYZ - Material");
-        form.setValue("fornecedor", "Fornecedor XYZ Ltda");
-        form.setValue("valor", "1200.00");
-        form.setValue("dataVencimento", "2024-02-15");
-        form.setValue("categoria", "fornecedores");
-        form.setValue("parcelas", "3");
+        form.setValue("description", "Fornecedor XYZ - Material");
+        form.setValue("total_amount", "1200.00");
+        form.setValue("due_date", "2024-02-15");
+        form.setValue("installments", "3");
         toast({
-          title: "Boleto processado!",
+          title: "Documento processado!",
           description: "Dados extraídos automaticamente. Revise e confirme.",
         });
       }, 2000);
     }
   };
 
-  const onSubmit = (data: any) => {
-    const novaConta: Conta = {
-      id: contas.length + 1,
-      descricao: data.descricao,
-      fornecedor: data.fornecedor,
-      valor: parseFloat(data.valor),
-      dataVencimento: data.dataVencimento,
-      status: "pendente",
-      categoria: data.categoria,
-      parcela: data.parcelas !== "1" ? `1/${data.parcelas}` : undefined,
-      observacoes: data.observacoes
-    };
-    
-    setContas([...contas, novaConta]);
-    
-    toast({
-      title: "Conta cadastrada!",
-      description: "A conta foi adicionada com sucesso.",
-    });
-    setIsDialogOpen(false);
-    form.reset();
-    setSelectedFile(null);
+  const onSubmit = async (data: any) => {
+    if (!orgId) {
+      toast({
+        title: "Erro",
+        description: "Selecione/Crie sua organização",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('bills')
+        .insert({
+          org_id: orgId,
+          description: data.description,
+          total_amount: parseFloat(data.total_amount),
+          due_date: data.due_date,
+          board: data.board,
+          status: "pending",
+          installments: parseInt(data.installments),
+          notes: data.notes
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Conta cadastrada!",
+        description: "A conta foi adicionada com sucesso.",
+      });
+      setIsDialogOpen(false);
+      form.reset();
+      setSelectedFile(null);
+      loadContas(); // Recarregar lista
+    } catch (error) {
+      console.error('Error creating bill:', error);
+      toast({
+        title: "Erro ao cadastrar conta",
+        description: "Tente novamente",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleConcluir = (id: number) => {
-    setContas(contas.map(conta => 
-      conta.id === id 
-        ? { ...conta, status: "concluido" as const }
-        : conta
-    ));
-    toast({
-      title: "Conta concluída!",
-      description: "A conta foi movida para o histórico.",
-    });
+  const handleConcluir = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('bills')
+        .update({ status: "completed" })
+        .eq('id', id)
+        .eq('org_id', orgId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Conta concluída!",
+        description: "A conta foi movida para o histórico.",
+      });
+      loadContas();
+    } catch (error) {
+      console.error('Error updating bill:', error);
+      toast({
+        title: "Erro ao atualizar conta",
+        description: "Tente novamente",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleVoltarConta = (id: number) => {
-    setContas(contas.map(conta => 
-      conta.id === id 
-        ? { ...conta, status: "pendente" as const }
-        : conta
-    ));
-    toast({
-      title: "Conta restaurada!",
-      description: "A conta foi movida de volta para a lista ativa.",
-    });
+  const handleVoltarConta = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('bills')
+        .update({ status: "pending" })
+        .eq('id', id)
+        .eq('org_id', orgId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Conta restaurada!",
+        description: "A conta foi movida de volta para a lista ativa.",
+      });
+      loadContas();
+    } catch (error) {
+      console.error('Error updating bill:', error);
+      toast({
+        title: "Erro ao restaurar conta",
+        description: "Tente novamente",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleExcluir = (id: number) => {
-    setContas(contas.filter(conta => conta.id !== id));
-    toast({
-      title: "Conta excluída!",
-      description: "A conta foi excluída com sucesso.",
-    });
+  const handleExcluir = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('bills')
+        .delete()
+        .eq('id', id)
+        .eq('org_id', orgId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Conta excluída!",
+        description: "A conta foi excluída com sucesso.",
+      });
+      loadContas();
+    } catch (error) {
+      console.error('Error deleting bill:', error);
+      toast({
+        title: "Erro ao excluir conta",
+        description: "Tente novamente",
+        variant: "destructive"
+      });
+    }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "pago":
+      case "paid":
         return <Badge className="bg-success/10 text-success border-success/20">Pago</Badge>;
-      case "pendente":
+      case "pending":
         return <Badge variant="outline">Pendente</Badge>;
-      case "vencido":
+      case "overdue":
         return <Badge className="bg-destructive/10 text-destructive border-destructive/20">Vencido</Badge>;
-      case "concluido":
+      case "completed":
         return <Badge className="bg-success/10 text-success border-success/20">Concluído</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
@@ -202,12 +262,12 @@ const Contas = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "pago":
-      case "concluido":
+      case "paid":
+      case "completed":
         return <CheckCircle className="h-4 w-4 text-success" />;
-      case "pendente":
+      case "pending":
         return <Clock className="h-4 w-4 text-warning" />;
-      case "vencido":
+      case "overdue":
         return <AlertTriangle className="h-4 w-4 text-destructive" />;
       default:
         return null;
@@ -215,16 +275,34 @@ const Contas = () => {
   };
 
   const contasPagar = contas.filter(conta => 
-    ["Fornecedores", "Fixas", "Utilitários"].includes(conta.categoria) && conta.status !== "concluido"
+    conta.board === "pagar" && conta.status !== "completed"
   );
   
   const contasReceber = contas.filter(conta => 
-    ["Vendas", "Serviços"].includes(conta.categoria) && conta.status !== "concluido"
+    conta.board === "receber" && conta.status !== "completed"
   );
 
-  const contasConcluidas = contas.filter(conta => conta.status === "concluido");
+  const contasConcluidas = contas.filter(conta => conta.status === "completed");
   
-  const todasContas = contas.filter(conta => conta.status !== "concluido");
+  const todasContas = contas.filter(conta => conta.status !== "completed");
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Contas</h1>
+            <p className="text-muted-foreground">Carregando...</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1,2,3,4,5,6].map(i => (
+            <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const renderContasTable = (contasData: Conta[], tipo: "pagar" | "receber" | "todas" | "concluidas") => (
     <Table>
@@ -251,25 +329,25 @@ const Contas = () => {
             </TableCell>
             <TableCell>
               <div>
-                <p className="font-medium">{conta.descricao}</p>
-                {conta.observacoes && (
-                  <p className="text-xs text-muted-foreground">{conta.observacoes}</p>
+                <p className="font-medium">{conta.description}</p>
+                {conta.notes && (
+                  <p className="text-xs text-muted-foreground">{conta.notes}</p>
                 )}
               </div>
             </TableCell>
-            <TableCell>{conta.fornecedor}</TableCell>
-            <TableCell>{conta.categoria}</TableCell>
-            <TableCell>{new Date(conta.dataVencimento).toLocaleDateString("pt-BR")}</TableCell>
-            <TableCell>{conta.parcela || "-"}</TableCell>
+            <TableCell>{conta.contact_id || "-"}</TableCell>
+            <TableCell>{conta.category_id || "-"}</TableCell>
+            <TableCell>{new Date(conta.due_date).toLocaleDateString("pt-BR")}</TableCell>
+            <TableCell>{conta.installments || "-"}</TableCell>
             <TableCell className="text-right font-medium">
-              {conta.valor.toLocaleString("pt-BR", {
+              {conta.total_amount.toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL"
               })}
             </TableCell>
             <TableCell className="text-right">
               <div className="flex items-center justify-end gap-2">
-                {conta.status !== "concluido" && (
+                {conta.status !== "completed" && (
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -366,7 +444,7 @@ const Contas = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="descricao"
+                    name="description"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Descrição</FormLabel>
@@ -379,13 +457,21 @@ const Contas = () => {
                   />
                   <FormField
                     control={form.control}
-                    name="fornecedor"
+                    name="board"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Fornecedor/Cliente</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nome do fornecedor ou cliente" {...field} />
-                        </FormControl>
+                        <FormLabel>Tipo</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o tipo" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="pagar">Conta a Pagar</SelectItem>
+                            <SelectItem value="receber">Conta a Receber</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -395,7 +481,7 @@ const Contas = () => {
                 <div className="grid grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
-                    name="valor"
+                    name="total_amount"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Valor Total</FormLabel>
@@ -408,7 +494,7 @@ const Contas = () => {
                   />
                   <FormField
                     control={form.control}
-                    name="dataVencimento"
+                    name="due_date"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Data de Vencimento</FormLabel>
@@ -421,7 +507,7 @@ const Contas = () => {
                   />
                   <FormField
                     control={form.control}
-                    name="parcelas"
+                    name="installments"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Número de Parcelas</FormLabel>
@@ -447,33 +533,7 @@ const Contas = () => {
 
                 <FormField
                   control={form.control}
-                  name="categoria"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Categoria</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione uma categoria" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Fornecedores">Fornecedores</SelectItem>
-                          <SelectItem value="Fixas">Despesas Fixas</SelectItem>
-                          <SelectItem value="Utilitários">Utilitários</SelectItem>
-                          <SelectItem value="Vendas">Vendas</SelectItem>
-                          <SelectItem value="Serviços">Serviços</SelectItem>
-                          <SelectItem value="Outros">Outros</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="observacoes"
+                  name="notes"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Observações</FormLabel>
@@ -506,7 +566,7 @@ const Contas = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-destructive">
-              {contasPagar.reduce((total, conta) => total + conta.valor, 0).toLocaleString("pt-BR", {
+              {contasPagar.reduce((total, conta) => total + conta.total_amount, 0).toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL"
               })}
@@ -522,7 +582,7 @@ const Contas = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">
-              {contasReceber.reduce((total, conta) => total + conta.valor, 0).toLocaleString("pt-BR", {
+              {contasReceber.reduce((total, conta) => total + conta.total_amount, 0).toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL"
               })}
@@ -646,11 +706,11 @@ const Contas = () => {
                     <div key={conta.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
                       <div className="flex items-center gap-4">
                         <div>
-                          <p className="font-medium">{conta.descricao}</p>
+                          <p className="font-medium">{conta.description}</p>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>{conta.fornecedor}</span>
+                            <span>{conta.contact_id || "N/A"}</span>
                             <span>•</span>
-                            <span>{new Date(conta.dataVencimento).toLocaleDateString("pt-BR")}</span>
+                            <span>{new Date(conta.due_date).toLocaleDateString("pt-BR")}</span>
                           </div>
                         </div>
                       </div>
@@ -659,7 +719,7 @@ const Contas = () => {
                           Concluído
                         </Badge>
                         <div className="font-bold">
-                          {conta.valor.toLocaleString("pt-BR", {
+                          {conta.total_amount.toLocaleString("pt-BR", {
                             style: "currency",
                             currency: "BRL"
                           })}
