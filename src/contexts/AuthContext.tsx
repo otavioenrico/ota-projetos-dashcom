@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   orgId: string | null;
+  setOrgId: (orgId: string | null) => void;
   login: (email: string, password: string) => Promise<boolean>;
   signUp: (email: string, password: string, fullName: string) => Promise<boolean>;
   logout: () => void;
@@ -26,63 +27,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Defer org setup with setTimeout to prevent deadlocks
-          setTimeout(async () => {
-            try {
-              const hasOrg = await hasOrganization(session.user.id);
-              if (!hasOrg) {
-                // Create organization for new user using RPC
-                try {
-                  const { data: newOrgId, error: rpcError } = await supabase.rpc('create_org_with_owner', {
-                    p_name: `Empresa de ${session.user.email?.split('@')[0] || 'Usuário'}`
-                  });
-                  
-                  if (rpcError) throw rpcError;
-                  
-                  setOrgId(newOrgId);
-                  console.log('Organization created via RPC:', newOrgId);
-                  
-                  toast({
-                    title: "Bem-vindo!",
-                    description: "Sua organização foi configurada com sucesso.",
-                  });
-                } catch (orgError) {
-                  console.error('Error creating organization:', orgError);
-                  toast({
-                    title: "Erro ao configurar organização",
-                    description: "Tente recarregar a página.",
-                    variant: "destructive"
-                  });
-                  setOrgId('default-org');
-                }
-              } else {
-                try {
-                  const currentOrgId = await getActiveOrgId();
-                  setOrgId(currentOrgId);
-                  console.log('Organization found:', currentOrgId);
-                } catch (orgError) {
-                  console.error('Error getting organization:', orgError);
-                  setOrgId('default-org');
-                }
-              }
-              setIsLoading(false);
-            } catch (error) {
-              console.error('Error setting up organization:', error);
-              // Set a default org ID to prevent infinite loading
-              setOrgId('default-org');
-              setIsLoading(false);
-            }
-          }, 0);
-        } else {
-          setOrgId(null);
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       }
     );
 
@@ -188,6 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     session,
     orgId,
+    setOrgId,
     login,
     signUp,
     logout,

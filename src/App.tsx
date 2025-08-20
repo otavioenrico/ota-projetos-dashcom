@@ -2,10 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
+import { useEffect } from "react";
 
 // Public pages
 import Homepage from "./pages/Homepage";
@@ -32,14 +33,23 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
+function AppContent() {
+  const { session, user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (session && user) {
+      const currentPath = window.location.pathname;
+      const isPublicRoute = ['/', '/login', '/registrar', '/produto', '/planos', '/central-ajuda', '/sobre-nos', '/politica-privacidade', '/termos-uso'].includes(currentPath);
+      
+      if (isPublicRoute) {
+        navigate('/auth/complete', { replace: true });
+      }
+    }
+  }, [session, user, navigate]);
+
+  return (
+    <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Homepage />} />
           <Route path="/produto" element={<Produto />} />
@@ -81,9 +91,20 @@ const App = () => (
           {/* 404 Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </AuthProvider>
+  );
+}
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

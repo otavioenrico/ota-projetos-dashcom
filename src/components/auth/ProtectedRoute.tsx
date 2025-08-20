@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, orgId, isLoading } = useAuth();
+  const { user, orgId, isLoading, session } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -18,7 +18,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  if (!user) {
+  if (!session || !user) {
     // Redireciona para login mas salva a localização atual
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
